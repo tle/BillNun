@@ -11,6 +11,7 @@ public class LoginInfo implements Serializable {
 	  private String nickname;
 
 	  public boolean isLoggedIn() {
+		  ///stuff
 	    return loggedIn;
 	  }
 
