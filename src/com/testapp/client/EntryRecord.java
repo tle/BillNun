@@ -19,6 +19,8 @@ public class EntryRecord implements Serializable{
 	
 	/**   a nother change
 	 * 
+	 * kkkk
+	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
