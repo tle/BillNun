@@ -17,7 +17,7 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable
 public class EntryRecord implements Serializable{
 	
-	/**   
+	/**   a nother change
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
