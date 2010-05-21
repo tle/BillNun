@@ -9,7 +9,8 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * ssss
+ * ss
+ * I have no idea what's going on
  * @author tle
  *
  */
