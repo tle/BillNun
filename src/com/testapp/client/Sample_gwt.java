@@ -63,8 +63,7 @@ public class Sample_gwt implements EntryPoint {
 		});
 	}
 
-	protected void drawSomeStuff() {
-		
+	protected void drawSomeStuff() {		
 		
 		greetingService.getRecords(new AsyncCallback<List<EntryRecord>>() {
 			@Override
