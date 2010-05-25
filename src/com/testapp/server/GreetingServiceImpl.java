@@ -46,7 +46,6 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	public LoginInfo login(String requestUri) {
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
-		String userId = user.getUserId();
 		LoginInfo loginInfo = new LoginInfo();
 		
 		if (user != null) {
