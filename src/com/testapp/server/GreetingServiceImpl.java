@@ -92,8 +92,9 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 				loginInfo.setNewUser(true);
 				UserAccount account = new UserAccount(loginInfo.getEmailAddress(), "xxx-xx-xxxx", 
 						"default_name"+System.currentTimeMillis());
-				pm.makePersistent(account);
+				account = pm.makePersistent(account);
 				loginInfo.setAccount(account);
+				
 			} finally {
 				pm.close();
 			}
@@ -238,6 +239,17 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		}
 		return resultList;
 	}
-	
-	
+
+	@Override
+	public void updateUserAccount(UserAccount account) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			UserAccount acc = pm.getObjectById(UserAccount.class, account.getKey());
+			acc.setEmail(account.getEmail());
+			acc.setPhoneNumber(account.getPhoneNumber());
+			acc.setUserName(account.getUserName());
+		} finally {
+			pm.close();
+		}
+	}
 }
