@@ -15,8 +15,11 @@ public interface GreetingServiceAsync {
 	
 	void getRecords(AsyncCallback<List<EntryRecord>> async);
 	
-	void getFriends(Long userId, AsyncCallback<List<Friend>> async);
+	void getUserAccounts(AsyncCallback<List<UserAccount>> async);
+		
+	void getFriends(AsyncCallback<List<Friend>> async);
 	
-	void addFriend(Long userId, Long friendUserId, )
+	void addFriend(String email, AsyncCallback<Void> async);
 	
+	<T> void getAllObjects(Class<T> clazz, AsyncCallback<List<T>> async);
 }

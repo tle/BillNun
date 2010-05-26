@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -82,23 +84,27 @@ public class Sample_gwt implements EntryPoint {
 	}
 
 	private FlowPanel getTestPanel() {
-		FlowPanel testPanel = new FlowPanel();
+		final FlowPanel testPanel = new FlowPanel();
 		
 		//Test out Friend datastore
-		greetingService.getRecords(new AsyncCallback<List<EntryRecord>>() {
+		greetingService.getAllObjects(UserAccount.class, new AsyncCallback<List<UserAccount>>() {
 			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-			}
+			public void onFailure(Throwable caught) {}
 			
-			public void onSuccess(List<EntryRecord> result) {
-				Button addFriend = new Button("Add Friend");
-				
-				String res = "";
-				for (EntryRecord rec : result) {
-					res+=rec.toString()+"\n";
+			public void onSuccess(List<UserAccount> result) {
+				for (final UserAccount account: result) {
+					Button addFriend = new Button("Become Friends with: " + account.getUserName() + " (" + account.getEmail() + ")");
+					addFriend.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							greetingService.addFriend(account.getEmail(), new AsyncCallback<Void>() {
+								public void onFailure(Throwable caught) {};
+								public void onSuccess(Void v) {}
+								
+							});
+						}
+					});
 				}
-				Window.alert(res);
 			};
 		});
 		

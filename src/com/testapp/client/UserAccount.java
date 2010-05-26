@@ -67,7 +67,12 @@ public class UserAccount implements Serializable {
 	public Long getKey() {
 		return key;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "UserAccount [email=" + email + ", key=" + key
+				+ ", phoneNumber=" + phoneNumber + ", userName=" + userName
+				+ "]";
+	}
 	
 }

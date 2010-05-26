@@ -3,6 +3,8 @@ package com.testapp.server;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
@@ -26,6 +28,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class GreetingServiceImpl extends RemoteServiceServlet implements
 		GreetingService {
+	
+	private static Logger logger = Logger.getLogger(GreetingServiceImpl.class.getName());
+	
 	private static LoginInfo currentUser = null;
 	
 	public static LoginInfo getCurrentLoginInfo() {
@@ -52,6 +57,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public LoginInfo login(String requestUri) {
+		this.currentUser = null; // Go ahead an invalidate the current user whenever we get a login request
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		LoginInfo loginInfo = new LoginInfo();
@@ -70,7 +76,9 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 			loginInfo.setNewUser(false);
 			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
 		}
-				
+			
+		this.currentUser = loginInfo;
+		
 		return loginInfo;
 	}
 	
@@ -95,6 +103,15 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	/**
+	 * Get all the UserAccounts in the system
+	 * 
+	 * @return
+	 */
+	public List<UserAccount> getUserAccounts() {
+		return getAll(UserAccount.class);
+	}
+	
 	private void createEntryRecord(User user) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		EntryRecord record  = new EntryRecord( user.getEmail(), new Date(System.currentTimeMillis()));
@@ -118,7 +135,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		return result;
 	}
 	
-	public List<Friend> getFriends(Long userId) {
+	public List<Friend> getFriends() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(Friend.class.getName());
 		q.setFilter("userIdParam == userId");
@@ -126,7 +143,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		
 		List<Friend> friends;
 		try {
-			friends = (List<Friend>) pm.newQuery(q).execute(userId);
+			friends = (List<Friend>) pm.newQuery(q).execute(currentUser.getAccount().getKey());
 			return wrapResults(friends);
 		}
 		finally {
@@ -134,33 +151,75 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	@Override
-	public void addFriend() {
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
-		LoginInfo loginInfo = new LoginInfo();
+	/**
+	 * Add a friend via email address.  If the email address is not already in the system, send them an invite.  If they are in the
+	 * system, add an entry into the friend table between the current user, and the user they'd like to friend
+	 * 
+	 * @param email
+	 */
+	public void addFriend(String email) {
+		//version 1 just add it to the table
 		
-		if (user != null) {
-			loginInfo.setLoggedIn(true);
-			loginInfo.setEmailAddress(user.getEmail());
-			loginInfo.setNickname(user.getNickname());
-			loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
-			
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			EntryRecord record  = new EntryRecord( user.getEmail(), new Date(System.currentTimeMillis()));
-			
-			try {
-				pm.makePersistent(record);
-			} finally {
-				pm.close();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(UserAccount.class.getName());
+		q.setFilter("emailParam == email");
+		q.declareParameters("String emailParam");
+		
+		try{
+			List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(q).execute();
+			if(accounts.size()==0) {
+				//Need to send out Invite
+			} 
+			else if (accounts.size() ==1) {
+				try {
+					UserAccount account = accounts.get(0);
+					Friend newFriend = new Friend();
+					newFriend.setUserId(currentUser.getAccount().getKey());
+					newFriend.setFriendUserId(account.getKey());
+					newFriend.setBalance(0);
+					pm.makePersistent(newFriend);
+				}
+				finally {
+					pm.close();
+				}
 			}
-		} else {
-			loginInfo.setLoggedIn(false);
-			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
+			else {
+				logger.log(Level.SEVERE, "There are two user accounts with the same email address:  " + accounts.toString());
+			}
 		}
+		finally {
+			q.closeAll();
+		}
+	}
+	
+	/**
+	 * Get all the objects of a certain type.
+	 * 
+	 * This will probably mostly be used for debugging and test.
+	 * 
+	 */
+	public <T> ArrayList<T> getAllObjects(Class<T> clazz) {
+		return getAll(clazz);
+	}
+	
+	/**
+	 * Generic method to get all objects of a certain type
+	 * 
+	 * @param <T>
+	 * @return
+	 */
+	private <T> ArrayList<T> getAll(Class<T> clazz) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(clazz.getName());
 		
-		
-		return loginInfo;
+		List<T> objects;
+		try {
+			objects = (List<T>) pm.newQuery(q).execute();
+			return wrapResults(objects);
+		}
+		finally {
+			q.closeAll();
+		}
 	}
 	
 	/**

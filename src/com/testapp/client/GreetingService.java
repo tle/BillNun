@@ -13,5 +13,8 @@ public interface GreetingService extends RemoteService {
 	String greetServer(String name) throws IllegalArgumentException;
 	public LoginInfo login(String requestUri);
 	public List<EntryRecord> getRecords();
+	public List<UserAccount> getUserAccounts();
 	public List<Friend> getFriends();
+	public void addFriend(String email);
+	public <T> List<T> getAllObjects(Class<T> clazz);
 }
