@@ -199,9 +199,9 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	 * This will probably mostly be used for debugging and test.
 	 * 
 	 */
-	public <T> ArrayList<T> getAllObjects(Class<T> clazz) {
-		return getAll(clazz);
-	}
+//	public <T> ArrayList<T> getAllObjects(Class<T> clazz) {
+//		return getAll(clazz);
+//	}
 	
 	/**
 	 * Generic method to get all objects of a certain type

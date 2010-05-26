@@ -16,6 +16,6 @@ public interface GreetingService extends RemoteService {
 	public List<UserAccount> getUserAccounts();
 	public List<Friend> getFriends();
 	public void addFriend(String email);
-	public <T> List<T> getAllObjects(Class<T> clazz);
+	//public <T> List<T> getAllObjects(Class<T> clazz);
 	public void updateUserAccount(UserAccount account);
 }

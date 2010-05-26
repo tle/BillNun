@@ -121,6 +121,8 @@ public class Sample_gwt implements EntryPoint {
 
 		signoutLink.setHref(loginInfo.getLogoutUrl());
 		mainPanel.add(signoutLink);
+		
+		mainPanel.add(getTestPanel());
 		RootPanel.get("nameList").add(mainPanel);
 	}
 
@@ -147,8 +149,8 @@ public class Sample_gwt implements EntryPoint {
 	private FlowPanel getTestPanel() {
 		final FlowPanel testPanel = new FlowPanel();
 		
-		//Test out Friend datastore
-		greetingService.getAllObjects(UserAccount.class, new AsyncCallback<List<UserAccount>>() {
+		//Test out Friend data store
+		greetingService.getUserAccounts(new AsyncCallback<List<UserAccount>>() {
 			@Override
 			public void onFailure(Throwable caught) {}
 			
@@ -159,6 +161,7 @@ public class Sample_gwt implements EntryPoint {
 					addFriend.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
+							rebuildFriendsPanel();
 							greetingService.addFriend(account.getEmail(), new AsyncCallback<Void>() {
 								public void onFailure(Throwable caught) {};
 								public void onSuccess(Void v) {}
@@ -169,6 +172,7 @@ public class Sample_gwt implements EntryPoint {
 			};
 		});
 		
+		testPanel.add(friendsList);
 		
 		return testPanel;
 	}

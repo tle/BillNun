@@ -21,7 +21,7 @@ public interface GreetingServiceAsync {
 	
 	void addFriend(String email, AsyncCallback<Void> async);
 	
-	<T> void getAllObjects(Class<T> clazz, AsyncCallback<List<T>> async);
+	//<T> void getAllObjects(Class<T> clazz, AsyncCallback<List<T>> async);
 
 	void updateUserAccount(UserAccount account, AsyncCallback<Void> async);
 }
