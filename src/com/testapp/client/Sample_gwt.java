@@ -4,11 +4,16 @@ import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
@@ -26,7 +31,14 @@ public class Sample_gwt implements EntryPoint {
 	private static LoginInfo loginInfo = null;
 	private VerticalPanel loginPanel = new VerticalPanel();
 	private Label loginLabel = new Label("Sign in using your gmail account");
-	private Anchor signinLink = new Anchor("Sign in");	
+	private Anchor signinLink = new Anchor("Sign in");
+	
+	private VerticalPanel mainPanel = new VerticalPanel();
+	private TextBox email = new TextBox();
+	private TextBox phoneNumber = new TextBox();
+	private TextBox userName = new TextBox();
+	Button createUserAccount = new Button("create");
+	
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting service.
 	 */
@@ -66,17 +78,68 @@ public class Sample_gwt implements EntryPoint {
 	protected void drawSomeStuff() {		
 		
 		if (loginInfo.isNewUser()) {
-			//TODO ask for user info
+			
+			HorizontalPanel emailPanel =
+				new HorizontalPanel();
+			emailPanel.add(new Label("email :"));
+			email.setText(loginInfo.getEmailAddress());
+			email.setEnabled(false);
+			emailPanel.add(email);
+			mainPanel.add(emailPanel);
+				
+			HorizontalPanel phonePanel =
+				new HorizontalPanel();
+			phonePanel.add(new Label("Phone # :"));
+			phonePanel.add(phoneNumber);
+			mainPanel.add(phonePanel);
+			
+			HorizontalPanel userPanel =
+				new HorizontalPanel();
+			userPanel.add(new Label("User name :"));
+			userPanel.add(userName);
+			mainPanel.add(userPanel);
+			
+			mainPanel.add(createUserAccount);
+			
+			createUserAccount.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					updateAccount();
+				}
+			});
+			
 		} else {
-			Window.alert("WELCOME back ,"+loginInfo.getAccount().getUserName() +" !!! " );
+			Window.alert("WELCOME back ,"+loginInfo.getAccount().getUserName() +" !!! \n" + 
+				loginInfo.getAccount().getPhoneNumber() + "\n"+
+				loginInfo.getAccount().getUserName()
+				);
 		}
-		
-		
 		
 		Anchor signoutLink = new Anchor("Sign out ," +loginInfo.getEmailAddress());
 
 		signoutLink.setHref(loginInfo.getLogoutUrl());
-		RootPanel.get("nameList").add(signoutLink);
+		mainPanel.add(signoutLink);
+		RootPanel.get("nameList").add(mainPanel);
+	}
+
+	protected void updateAccount() {
+		final UserAccount account = loginInfo.getAccount();
+		account.setEmail(email.getText());
+		account.setPhoneNumber(phoneNumber.getText());
+		account.setUserName(userName.getText());
+		
+		greetingService.updateUserAccount(account, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void onSuccess(Void result) {
+				Window.alert("Account created.");
+				
+			}
+		});
 	}
 
 	protected void loadLogin() {

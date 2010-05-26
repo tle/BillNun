@@ -14,4 +14,6 @@ public interface GreetingServiceAsync {
 	void login(String requestUri, AsyncCallback<LoginInfo> async);
 	
 	void getRecords(AsyncCallback<List<EntryRecord>> async);
+	
+	void updateUserAccount(UserAccount account, AsyncCallback<Void> async);
 }
