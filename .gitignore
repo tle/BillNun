@@ -1,1 +1,3 @@
 war/WEB-INF/classes
+war/sample_gwt
+war/WEB-INF/appengine-generated/
