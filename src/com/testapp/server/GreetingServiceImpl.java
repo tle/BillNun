@@ -12,6 +12,7 @@ import com.testapp.client.EntryRecord;
 import com.testapp.client.Friend;
 import com.testapp.client.GreetingService;
 import com.testapp.client.LoginInfo;
+import com.testapp.client.UserAccount;
 import com.testapp.server.jdo.PMF;
 import com.testapp.shared.FieldVerifier;
 import com.google.appengine.api.users.User;
@@ -61,21 +62,48 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 			loginInfo.setNickname(user.getNickname());
 			loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
 			
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			EntryRecord record  = new EntryRecord( user.getEmail(), new Date(System.currentTimeMillis()));
-			
+			createEntryRecord(user);
+			createNewUserAccount(loginInfo);
+		} else {
+			//there already is an existed session
+			loginInfo.setLoggedIn(false);
+			loginInfo.setNewUser(false);
+			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
+		}
+				
+		return loginInfo;
+	}
+	
+	private void createNewUserAccount(LoginInfo loginInfo) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		String query = " select from " + UserAccount.class.getName() +" where email == '"+loginInfo.getEmailAddress()+"'" ;
+		List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(query).execute();
+		if (accounts.size() == 0) {
 			try {
-				pm.makePersistent(record);
+				//new user
+				loginInfo.setNewUser(true);
+				UserAccount account = new UserAccount(loginInfo.getEmailAddress(), "xxx-xx-xxxx", 
+						"default_name"+System.currentTimeMillis());
+				pm.makePersistent(account);
+				loginInfo.setAccount(account);
 			} finally {
 				pm.close();
 			}
 		} else {
-			loginInfo.setLoggedIn(false);
-			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
+			loginInfo.setAccount(accounts.get(0));//there should be only one
+			loginInfo.setNewUser(false);
 		}
+	}
+
+	private void createEntryRecord(User user) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		EntryRecord record  = new EntryRecord( user.getEmail(), new Date(System.currentTimeMillis()));
 		
-		
-		return loginInfo;
+		try {
+			pm.makePersistent(record);
+		} finally {
+			pm.close();
+		}
 	}
 
 	@Override
