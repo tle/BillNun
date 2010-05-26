@@ -27,6 +27,9 @@ public class Friend implements Serializable{
 	@Persistent
 	private Long friendUserId;
 
+	@Persistent
+	private int balance;
+	
 	public Long getKey() {
 		return key;
 	}
@@ -51,11 +54,12 @@ public class Friend implements Serializable{
 		this.friendUserId = friendUserId;
 	}
 
-	@Override
-	public String toString() {
-		return "Friend [friendUserId=" + friendUserId + ", key=" + key
-				+ ", userId=" + userId + ", toString()=" + super.toString()
-				+ "]";
+	public int getBalance() {
+		return balance;
+	}
+
+	public void setBalance(int balance) {
+		this.balance = balance;
 	}
 	
 }

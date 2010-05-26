@@ -14,4 +14,9 @@ public interface GreetingServiceAsync {
 	void login(String requestUri, AsyncCallback<LoginInfo> async);
 	
 	void getRecords(AsyncCallback<List<EntryRecord>> async);
+	
+	void getFriends(Long userId, AsyncCallback<List<Friend>> async);
+	
+	void addFriend(Long userId, Long friendUserId, )
+	
 }

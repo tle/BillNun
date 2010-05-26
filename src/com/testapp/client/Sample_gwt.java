@@ -7,6 +7,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -86,7 +88,33 @@ public class Sample_gwt implements EntryPoint {
 		RootPanel.get("nameList").add(signoutLink);
 	}
 
+	private FlowPanel getTestPanel() {
+		FlowPanel testPanel = new FlowPanel();
+		
+		//Test out Friend datastore
+		greetingService.getRecords(new AsyncCallback<List<EntryRecord>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+			}
+			
+			public void onSuccess(List<EntryRecord> result) {
+				Button addFriend = new Button("Add Friend");
+				
+				String res = "";
+				for (EntryRecord rec : result) {
+					res+=rec.toString()+"\n";
+				}
+				Window.alert(res);
+			};
+		});
+		
+		return testPanel;
+	}
+	
 	protected void loadLogin() {
+		loginPanel.setStylePrimaryName("test-panel");
+		
 		signinLink.setHref(loginInfo.getLoginUrl());
 		loginPanel.add(loginLabel);
 		loginPanel.add(signinLink);
