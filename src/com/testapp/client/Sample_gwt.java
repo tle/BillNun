@@ -161,10 +161,11 @@ public class Sample_gwt implements EntryPoint {
 					addFriend.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							rebuildFriendsPanel();
 							greetingService.addFriend(account.getEmail(), new AsyncCallback<Void>() {
 								public void onFailure(Throwable caught) {};
-								public void onSuccess(Void v) {}
+								public void onSuccess(Void v) {
+									rebuildFriendsPanel();
+								}
 							});
 						}
 					});
@@ -172,6 +173,7 @@ public class Sample_gwt implements EntryPoint {
 			};
 		});
 		
+		rebuildFriendsPanel();
 		testPanel.add(friendsList);
 		
 		return testPanel;

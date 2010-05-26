@@ -138,8 +138,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	
 	public List<Friend> getFriends() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(Friend.class.getName());
-		q.setFilter("userIdParam == userId");
+		Query q = pm.newQuery(Friend.class);
+		q.setFilter("userId == userIdParam");
 		q.declareParameters("Long userIdParam");
 		
 		List<Friend> friends;
@@ -162,12 +162,12 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		//version 1 just add it to the table
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(UserAccount.class.getName());
-		q.setFilter("emailParam == email");
+		Query q = pm.newQuery(UserAccount.class);
+		q.setFilter("email == emailParam");
 		q.declareParameters("String emailParam");
 		
 		try{
-			List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(q).execute();
+			List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(q).execute(email);
 			if(accounts.size()==0) {
 				//Need to send out Invite
 			} 
@@ -211,7 +211,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	 */
 	private <T> ArrayList<T> getAll(Class<T> clazz) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(clazz.getName());
+		Query q = pm.newQuery(clazz);
 		
 		List<T> objects;
 		try {
