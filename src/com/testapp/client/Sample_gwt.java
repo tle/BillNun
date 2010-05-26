@@ -65,20 +65,13 @@ public class Sample_gwt implements EntryPoint {
 
 	protected void drawSomeStuff() {		
 		
-		greetingService.getRecords(new AsyncCallback<List<EntryRecord>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-			}
-			
-			public void onSuccess(List<EntryRecord> result) {
-				String res = "";
-				for (EntryRecord rec : result) {
-					res+=rec.toString()+"\n";
-				}
-				Window.alert(res);
-			};
-		});
+		if (loginInfo.isNewUser()) {
+			//TODO ask for user info
+		} else {
+			Window.alert("WELCOME back ,"+loginInfo.getAccount().getUserName() +" !!! " );
+		}
+		
+		
 		
 		Anchor signoutLink = new Anchor("Sign out ," +loginInfo.getEmailAddress());
 
