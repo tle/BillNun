@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
 import com.testapp.client.EntryRecord;
@@ -15,6 +14,7 @@ import com.testapp.client.Friend;
 import com.testapp.client.GreetingService;
 import com.testapp.client.LoginInfo;
 import com.testapp.client.UserAccount;
+import com.testapp.client.UserAccount.UserAccountStatus;
 import com.testapp.server.jdo.PMF;
 import com.testapp.shared.FieldVerifier;
 import com.google.appengine.api.users.User;
@@ -46,11 +46,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 					"Name must be at least 4 characters long");
 		}
 		
-		PersistenceManagerFactory pmf = PMF.get();
-		
 		String serverInfo = getServletContext().getServerInfo();
 		String userAgent = getThreadLocalRequest().getHeader("User-Agent");
-		String tst = pmf.toString();
 		return "Hello, " + input + "!<br><br>I am running " + serverInfo
 				+ ".<br><br>It looks like you are using:<br>" + userAgent +"/n" ;
 	}
@@ -69,7 +66,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 			loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
 			
 			createEntryRecord(user);
-			createNewUserAccount(loginInfo);
+			createUserAccountPerLoginInfo(loginInfo);
 		} else {
 			//there already is an existed session
 			loginInfo.setLoggedIn(false);
@@ -82,25 +79,43 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		return loginInfo;
 	}
 	
-	private void createNewUserAccount(LoginInfo loginInfo) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String query = " select from " + UserAccount.class.getName() +" where email == '"+loginInfo.getEmailAddress()+"'" ;
-		List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(query).execute();
-		if (accounts.size() == 0) {
-			try {
-				//new user
-				loginInfo.setNewUser(true);
-				UserAccount account = new UserAccount(loginInfo.getEmailAddress(), "xxx-xx-xxxx", 
-						"default_name"+System.currentTimeMillis());
-				account = pm.makePersistent(account);
-				loginInfo.setAccount(account);
-				
-			} finally {
-				pm.close();
-			}
+	private void createUserAccountPerLoginInfo(LoginInfo loginInfo) {
+		
+		String emailAddress = loginInfo.getEmailAddress();
+		UserAccount account = getUserAccount(emailAddress);
+		if (account == null) {
+			account = newUserAccount(loginInfo.getEmailAddress(), 
+					"xxx-xx-xxxx", "default_name"+System.currentTimeMillis(), 
+					UserAccountStatus.ACCEPTED);
+			loginInfo.setNewUser(true);			
 		} else {
-			loginInfo.setAccount(accounts.get(0));//there should be only one
 			loginInfo.setNewUser(false);
+		}
+		loginInfo.setAccount(account);
+	}
+	
+	private UserAccount newUserAccount(String email, String phoneNumber, String username, UserAccountStatus status ) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		UserAccount account = null;
+		try {
+
+			account = new UserAccount(email, "xxx-xx-xxxx", 
+					"default_name"+System.currentTimeMillis(), status);
+			account = pm.makePersistent(account);
+			return account;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	private UserAccount getUserAccount(String email) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		String query = " select from " + UserAccount.class.getName() +" where email == '"+email+"'" ;
+		List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(query).execute();
+		if (accounts!=null && accounts.size()>0) {
+			return accounts.get(0); 
+		} else {
+			return null;
 		}
 	}
 
@@ -169,7 +184,13 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		try{
 			List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(q).execute(email);
 			if(accounts.size()==0) {
-				//Need to send out Invite
+				//TODO Need to send out Invite
+				
+				//for now we will create a user account with a PENDING status
+				UserAccount newAccount =
+					newUserAccount(email, "xxx-xx-xxxx",
+							"default_name"+System.currentTimeMillis(), 
+							UserAccountStatus.PENDING);
 			} 
 			else if (accounts.size() ==1) {
 				try {

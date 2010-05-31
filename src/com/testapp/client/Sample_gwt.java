@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.testapp.client.UserAccount.UserAccountStatus;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -77,52 +78,70 @@ public class Sample_gwt implements EntryPoint {
 		});
 	}
 
-	protected void drawSomeStuff() {		
+	protected void drawSomeStuff() {
 		
-		if (loginInfo.isNewUser()) {
-			
-			HorizontalPanel emailPanel =
-				new HorizontalPanel();
-			emailPanel.add(new Label("email :"));
-			email.setText(loginInfo.getEmailAddress());
-			email.setEnabled(false);
-			emailPanel.add(email);
-			mainPanel.add(emailPanel);
-				
-			HorizontalPanel phonePanel =
-				new HorizontalPanel();
-			phonePanel.add(new Label("Phone # :"));
-			phonePanel.add(phoneNumber);
-			mainPanel.add(phonePanel);
-			
-			HorizontalPanel userPanel =
-				new HorizontalPanel();
-			userPanel.add(new Label("User name :"));
-			userPanel.add(userName);
-			mainPanel.add(userPanel);
-			
-			mainPanel.add(createUserAccount);
-			
-			createUserAccount.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					updateAccount();
-				}
-			});
-			
-		} else {
-			Window.alert("WELCOME back ,"+loginInfo.getAccount().getUserName() +" !!! \n" + 
-				loginInfo.getAccount().getPhoneNumber() + "\n"+
-				loginInfo.getAccount().getUserName()
-				);
-		}
+		// User registration data
+		HorizontalPanel emailPanel =
+			new HorizontalPanel();
+		emailPanel.add(new Label("email :"));
+		email.setText(loginInfo.getEmailAddress());
+		email.setEnabled(false);
+		emailPanel.add(email);
+		mainPanel.add(emailPanel);
+
+		HorizontalPanel phonePanel =
+			new HorizontalPanel();
+		phonePanel.add(new Label("Phone # :"));
+		phonePanel.add(phoneNumber);
+		phoneNumber.setText(loginInfo.getAccount().getPhoneNumber());
+		mainPanel.add(phonePanel);
+
+		HorizontalPanel userPanel =
+			new HorizontalPanel();
+		userPanel.add(new Label("User name :"));
+		userPanel.add(userName);
+		userName.setText(loginInfo.getAccount().getUserName());
+		mainPanel.add(userPanel);
+
+		mainPanel.add(createUserAccount);
+
+		createUserAccount.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				updateAccount();
+			}
+		});
+
 		
+		// add friend widget
+		HorizontalPanel addFriendPanel = 
+			new HorizontalPanel();
+		final TextBox friendName = new TextBox();
+		addFriendPanel.add(friendName);
+		Button addFriend = new Button("Add this user");
+
+		addFriend.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				greetingService.addFriend(friendName.getText(), new AsyncCallback<Void>() {
+					public void onFailure(Throwable caught) {};
+					public void onSuccess(Void v) {
+						rebuildFriendsPanel();
+					}
+				});
+			}
+		});
+		addFriendPanel.add(addFriend);
+		mainPanel.add(addFriendPanel);
+		
+		//sign out link
 		Anchor signoutLink = new Anchor("Sign out ," +loginInfo.getEmailAddress());
 
 		signoutLink.setHref(loginInfo.getLogoutUrl());
 		mainPanel.add(signoutLink);
 		
-		mainPanel.add(getTestPanel());
+		mainPanel.add(getFriendsPanel());
 		RootPanel.get("nameList").add(mainPanel);
 	}
 
@@ -131,6 +150,10 @@ public class Sample_gwt implements EntryPoint {
 		account.setEmail(email.getText());
 		account.setPhoneNumber(phoneNumber.getText());
 		account.setUserName(userName.getText());
+		
+		if (UserAccountStatus.PENDING.equals(account.getStatus())) {
+			account.setStatus(UserAccountStatus.ACCEPTED);
+		}
 		
 		greetingService.updateUserAccount(account, new AsyncCallback<Void>() {
 			@Override
@@ -146,7 +169,7 @@ public class Sample_gwt implements EntryPoint {
 		});
 	}
 
-	private FlowPanel getTestPanel() {
+	private FlowPanel getFriendsPanel() {
 		final FlowPanel testPanel = new FlowPanel();
 		
 		//Test out Friend data store
