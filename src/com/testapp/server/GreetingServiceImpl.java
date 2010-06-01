@@ -1,13 +1,7 @@
 package com.testapp.server;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 import com.testapp.client.EntryRecord;
 import com.testapp.client.Friend;
@@ -15,7 +9,9 @@ import com.testapp.client.GreetingService;
 import com.testapp.client.LoginInfo;
 import com.testapp.client.UserAccount;
 import com.testapp.client.UserAccount.UserAccountStatus;
-import com.testapp.server.jdo.PMF;
+import com.testapp.server.jdo.EntryRecordFactory;
+import com.testapp.server.jdo.FriendFactory;
+import com.testapp.server.jdo.UserAccountFactory;
 import com.testapp.shared.FieldVerifier;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -82,9 +78,9 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	private void createUserAccountPerLoginInfo(LoginInfo loginInfo) {
 		
 		String emailAddress = loginInfo.getEmailAddress();
-		UserAccount account = getUserAccount(emailAddress);
+		UserAccount account = UserAccountFactory.getInstance().getUserAccount(emailAddress);
 		if (account == null) {
-			account = newUserAccount(loginInfo.getEmailAddress(), 
+			account = UserAccountFactory.getInstance().newUserAccount(loginInfo.getEmailAddress(), 
 					"xxx-xx-xxxx", "default_name"+System.currentTimeMillis(), 
 					UserAccountStatus.ACCEPTED);
 			loginInfo.setNewUser(true);			
@@ -92,79 +88,20 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 			loginInfo.setNewUser(false);
 		}
 		loginInfo.setAccount(account);
-	}
-	
-	private UserAccount newUserAccount(String email, String phoneNumber, String username, UserAccountStatus status ) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		UserAccount account = null;
-		try {
-
-			account = new UserAccount(email, "xxx-xx-xxxx", 
-					"default_name"+System.currentTimeMillis(), status);
-			account = pm.makePersistent(account);
-			return account;
-		} finally {
-			pm.close();
-		}
-	}
-	
-	private UserAccount getUserAccount(String email) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String query = " select from " + UserAccount.class.getName() +" where email == '"+email+"'" ;
-		List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(query).execute();
-		if (accounts!=null && accounts.size()>0) {
-			return accounts.get(0); 
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Get all the UserAccounts in the system
-	 * 
-	 * @return
-	 */
-	public List<UserAccount> getUserAccounts() {
-		return getAll(UserAccount.class);
-	}
+	}	
 	
 	private void createEntryRecord(User user) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		EntryRecord record  = new EntryRecord( user.getEmail(), new Date(System.currentTimeMillis()));
-		
-		try {
-			pm.makePersistent(record);
-		} finally {
-			pm.close();
-		}
+		EntryRecordFactory.getInstance().newEntryRecord(user);
 	}
 
 	@Override
 	public List<EntryRecord> getRecords() {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String query = "select from "+EntryRecord.class.getName();
-		List<EntryRecord> greetings = (List<EntryRecord>)pm.newQuery(query).execute();
-		List<EntryRecord> result = new ArrayList<EntryRecord>();
-		for (EntryRecord rec: greetings) {
-			result.add(rec);
-		}
+		List<EntryRecord> result = EntryRecordFactory.getInstance().getAll();
 		return result;
 	}
 	
 	public List<Friend> getFriends() {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(Friend.class);
-		q.setFilter("userId == userIdParam");
-		q.declareParameters("Long userIdParam");
-		
-		List<Friend> friends;
-		try {
-			friends = (List<Friend>) pm.newQuery(q).execute(currentUser.getAccount().getKey());
-			return wrapResults(friends);
-		}
-		finally {
-			q.closeAll();
-		}
+		return FriendFactory.getInstance().getFriendsOf(currentUser.getAccount().getKey());
 	}
 	
 	/**
@@ -174,44 +111,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	 * @param email
 	 */
 	public void addFriend(String email) {
-		//version 1 just add it to the table
-		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(UserAccount.class);
-		q.setFilter("email == emailParam");
-		q.declareParameters("String emailParam");
-		
-		try{
-			List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(q).execute(email);
-			if(accounts.size()==0) {
-				//TODO Need to send out Invite
-				
-				//for now we will create a user account with a PENDING status
-				UserAccount newAccount =
-					newUserAccount(email, "xxx-xx-xxxx",
-							"default_name"+System.currentTimeMillis(), 
-							UserAccountStatus.PENDING);
-			} 
-			else if (accounts.size() ==1) {
-				try {
-					UserAccount account = accounts.get(0);
-					Friend newFriend = new Friend();
-					newFriend.setUserId(currentUser.getAccount().getKey());
-					newFriend.setFriendUserId(account.getKey());
-					newFriend.setBalance(0);
-					pm.makePersistent(newFriend);
-				}
-				finally {
-					pm.close();
-				}
-			}
-			else {
-				logger.log(Level.SEVERE, "There are two user accounts with the same email address:  " + accounts.toString());
-			}
-		}
-		finally {
-			q.closeAll();
-		}
+		FriendFactory.getInstance().addFriend(currentUser.getAccount().getKey(), email);
 	}
 	
 	/**
@@ -223,54 +123,14 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 //	public <T> ArrayList<T> getAllObjects(Class<T> clazz) {
 //		return getAll(clazz);
 //	}
-	
-	/**
-	 * Generic method to get all objects of a certain type
-	 * 
-	 * @param <T>
-	 * @return
-	 */
-	private <T> ArrayList<T> getAll(Class<T> clazz) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(clazz);
-		
-		List<T> objects;
-		try {
-			objects = (List<T>) pm.newQuery(q).execute();
-			return wrapResults(objects);
-		}
-		finally {
-			q.closeAll();
-		}
-	}
-	
-	/**
-	 * Iterates through result set and puts it into an ArrayList.
-	 * 
-	 * Should be used after a query execute call.
-	 * 
-	 * @param <T>
-	 * @param results
-	 * @return
-	 */
-	private <T> ArrayList<T> wrapResults(List<T> results) {
-		ArrayList<T> resultList = new ArrayList<T>();
-		for(T result: results) {
-			resultList.add(result);
-		}
-		return resultList;
-	}
 
 	@Override
 	public void updateUserAccount(UserAccount account) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		try {
-			UserAccount acc = pm.getObjectById(UserAccount.class, account.getKey());
-			acc.setEmail(account.getEmail());
-			acc.setPhoneNumber(account.getPhoneNumber());
-			acc.setUserName(account.getUserName());
-		} finally {
-			pm.close();
-		}
+		UserAccountFactory.getInstance().save(account);
+	}
+
+	@Override
+	public List<UserAccount> getUserAccounts() {
+		return UserAccountFactory.getInstance().getAll();
 	}
 }
