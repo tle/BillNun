@@ -118,7 +118,7 @@ public class Sample_gwt implements EntryPoint {
 			new HorizontalPanel();
 		final TextBox friendName = new TextBox();
 		addFriendPanel.add(friendName);
-		Button addFriend = new Button("Add this user");
+		Button addFriend = new Button("Add as a friend");
 
 		addFriend.addClickHandler(new ClickHandler() {
 			

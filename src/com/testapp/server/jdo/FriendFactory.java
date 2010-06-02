@@ -1,5 +1,6 @@
 package com.testapp.server.jdo;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,17 +33,23 @@ public class FriendFactory extends PersistentObjectFactory<Friend> {
 	
 	public List<Friend> getFriendsOf(Long userKey) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(Friend.class);
-		q.setFilter("userId == userIdParam");
-		q.declareParameters("Long userIdParam");
 		
-		List<Friend> friends;
+		Query q1 = pm.newQuery(Friend.class);
+		q1.setFilter("userId == userIdParam");
+		q1.declareParameters("Long userIdParam");		
+		
+		Query q2 = pm.newQuery(Friend.class);
+		q2.setFilter("friendUserId == userIdParam");
+		q2.declareParameters("Long userIdParam");
+				
 		try {
-			friends = (List<Friend>) pm.newQuery(q).execute(userKey);
-			return wrapResults(friends);
+			List<Friend> friends1 = wrapResults((List<Friend>) pm.newQuery(q1).execute(userKey));
+			List<Friend> friends2 = wrapResults((List<Friend>) pm.newQuery(q2).execute(userKey));
+			friends1.addAll(friends2);
+			return friends1;
 		}
 		finally {
-			q.closeAll();
+			q1.closeAll();
 		}
 	}
 	
