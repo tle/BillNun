@@ -21,5 +21,12 @@
 	        <include name="**/*.jar" />
 	      </fileset>
 	    </copy>
+		<copy
+	        todir="war/WEB-INF/lib"
+	        flatten="true">
+	      <fileset dir="${gwt.sdk.dir}">
+	        <include name="gwt-servlet.jar" />
+	      </fileset>
+	    </copy>
 	  </target>
 </project>
