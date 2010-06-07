@@ -1,5 +1,25 @@
 <project>
-  <property file="build.properties" />
-  <import file="${appengine.sdk.dir}/config/user/ant-macros.xml" />
+  	<property file="build.properties" />
+  	<import file="${appengine.sdk.dir}/config/user/ant-macros.xml" />
 
+	<path id="project.classpath">
+	    <pathelement path="war/WEB-INF/classes" />
+	    <fileset dir="war/WEB-INF/lib">
+	      <include name="**/*.jar" />
+	    </fileset>
+	    <fileset dir="${appengine.sdk.dir}/lib">
+	      <include name="shared/**/*.jar" />
+	    </fileset>
+	  </path>
+	
+	<target name="copyjars"
+	      description="Copies the App Engine JARs to the WAR.">
+	    <copy
+	        todir="war/WEB-INF/lib"
+	        flatten="true">
+	      <fileset dir="${appengine.sdk.dir}/lib/user">
+	        <include name="**/*.jar" />
+	      </fileset>
+	    </copy>
+	  </target>
 </project>
