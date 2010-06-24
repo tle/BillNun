@@ -1,8 +1,11 @@
-package com.testapp.client;
+package com.testapp.client.api;
 
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.testapp.client.LoginInfo;
+import com.testapp.client.pos.EntryRecord;
+import com.testapp.client.pos.UserAccount;
 
 /**
  * The async counterpart of <code>GreetingService</code>.
@@ -17,11 +20,9 @@ public interface GreetingServiceAsync {
 	
 	void getUserAccounts(AsyncCallback<List<UserAccount>> async);
 		
-	void getFriends(AsyncCallback<List<Friend>> async);
+	void getFriends(AsyncCallback<List<UserAccount>> async);
 	
 	void addFriend(String email, AsyncCallback<Void> async);
-	
-	//<T> void getAllObjects(Class<T> clazz, AsyncCallback<List<T>> async);
 
 	void updateUserAccount(UserAccount account, AsyncCallback<Void> async);
 }

@@ -1,7 +1,6 @@
-package com.testapp.client;
+package com.testapp.client.pos;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -25,7 +24,7 @@ public class Friend implements Serializable{
 	private Long userId;
 	
 	@Persistent
-	private Long friendUserId;
+	private Long friendAccountId;
 
 	@Persistent
 	private int balance;
@@ -46,12 +45,12 @@ public class Friend implements Serializable{
 		this.userId = userId;
 	}
 
-	public Long getFriendUserId() {
-		return friendUserId;
+	public Long getFriendAccountId() {
+		return friendAccountId;
 	}
 
-	public void setFriendUserId(Long friendUserId) {
-		this.friendUserId = friendUserId;
+	public void setFriendAccountId(Long friendAccountId) {
+		this.friendAccountId = friendAccountId;
 	}
 
 	public int getBalance() {

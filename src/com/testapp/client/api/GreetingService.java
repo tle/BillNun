@@ -1,9 +1,12 @@
-package com.testapp.client;
+package com.testapp.client.api;
 
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.testapp.client.LoginInfo;
+import com.testapp.client.pos.EntryRecord;
+import com.testapp.client.pos.UserAccount;
 
 /**
  * The client side stub for the RPC service.
@@ -14,8 +17,7 @@ public interface GreetingService extends RemoteService {
 	public LoginInfo login(String requestUri);
 	public List<EntryRecord> getRecords();
 	public List<UserAccount> getUserAccounts();
-	public List<Friend> getFriends();
+	public List<UserAccount> getFriends();
 	public void addFriend(String email);
-	//public <T> List<T> getAllObjects(Class<T> clazz);
 	public void updateUserAccount(UserAccount account);
 }

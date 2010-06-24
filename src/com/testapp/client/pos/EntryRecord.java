@@ -1,4 +1,4 @@
-package com.testapp.client;
+package com.testapp.client.pos;
 
 import java.io.Serializable;
 import java.util.Date;

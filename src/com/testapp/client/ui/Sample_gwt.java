@@ -1,4 +1,4 @@
-package com.testapp.client;
+package com.testapp.client.ui;
 
 import java.util.List;
 
@@ -16,6 +16,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.testapp.client.LoginInfo;
+import com.testapp.client.api.GreetingService;
+import com.testapp.client.api.GreetingServiceAsync;
+import com.testapp.client.pos.UserAccount;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -180,15 +184,15 @@ public class Sample_gwt implements EntryPoint {
 	}
 	
 	private void rebuildFriendsPanel() {
-		greetingService.getFriends(new AsyncCallback<List<Friend>>() {
+		greetingService.getFriends(new AsyncCallback<List<UserAccount>>() {
 			@Override
 			public void onFailure(Throwable caught) {}
 			
-			public void onSuccess(List<Friend> result) {
+			public void onSuccess(List<UserAccount> result) {
 				friendsList.clear();
-				friendsList.add(new Label("-MY FRIENDS-"));
-				for (final Friend friend: result) {
-					friendsList.add(new Label("" + friend.getFriendUserId()));
+				friendsList.add(new Label("-MY FRIENDS ARE-"));
+				for (final UserAccount friend: result) {
+					friendsList.add(new Label(friend.getUserName()));
 				}
 			};
 		});

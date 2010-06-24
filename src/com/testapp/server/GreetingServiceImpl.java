@@ -1,7 +1,9 @@
 package com.testapp.server;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,11 +12,11 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
-import com.testapp.client.EntryRecord;
-import com.testapp.client.Friend;
-import com.testapp.client.GreetingService;
 import com.testapp.client.LoginInfo;
-import com.testapp.client.UserAccount;
+import com.testapp.client.api.GreetingService;
+import com.testapp.client.pos.EntryRecord;
+import com.testapp.client.pos.Friend;
+import com.testapp.client.pos.UserAccount;
 import com.testapp.server.jdo.PMF;
 import com.testapp.shared.FieldVerifier;
 import com.google.appengine.api.users.User;
@@ -26,8 +28,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * The server side implementation of the RPC service.
  */
 @SuppressWarnings("serial")
-public class GreetingServiceImpl extends RemoteServiceServlet implements
-		GreetingService {
+public class GreetingServiceImpl extends RemoteServiceServlet implements GreetingService {
 	
 	private static Logger logger = Logger.getLogger(GreetingServiceImpl.class.getName());
 	
@@ -136,16 +137,24 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		return result;
 	}
 	
-	public List<Friend> getFriends() {
+	public List<UserAccount> getFriends() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(Friend.class);
 		q.setFilter("userId == userIdParam");
 		q.declareParameters("Long userIdParam");
 		
 		List<Friend> friends;
+		List<UserAccount> accounts = new ArrayList<UserAccount>();
 		try {
 			friends = (List<Friend>) pm.newQuery(q).execute(currentUser.getAccount().getKey());
-			return wrapResults(friends);
+			for(Friend friend: friends) {
+				UserAccount friendAccount = pm.getObjectById(UserAccount.class, friend.getFriendAccountId());
+				if(friendAccount != null) {
+					accounts.add(friendAccount);
+				}
+			}
+			
+			return accounts;
 		}
 		finally {
 			q.closeAll();
@@ -160,6 +169,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 	 */
 	public void addFriend(String email) {
 		//version 1 just add it to the table
+		// Find the user account with the email address
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(UserAccount.class);
@@ -172,11 +182,17 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 				//Need to send out Invite
 			} 
 			else if (accounts.size() ==1) {
+				UserAccount account = accounts.get(0);
+				
 				try {
-					UserAccount account = accounts.get(0);
+					q = pm.newQuery(Friend.class);
+					q.setFilter("friendAccountId == friendAccountIdParam");
+					q.declareParameters("long friendAccountIdParam");
+					List<Friend> friends = (List<Friend>)pm.newQuery(q).execute(account.getKey());
+					
 					Friend newFriend = new Friend();
 					newFriend.setUserId(currentUser.getAccount().getKey());
-					newFriend.setFriendUserId(account.getKey());
+					newFriend.setFriendAccountId(account.getKey());
 					newFriend.setBalance(0);
 					pm.makePersistent(newFriend);
 				}
@@ -185,7 +201,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 				}
 			}
 			else {
-				logger.log(Level.SEVERE, "There are two user accounts with the same email address:  " + accounts.toString());
+				logger.log(Level.SEVERE, "There are more than one user accounts with the same email address:  " + accounts.toString());
 			}
 		}
 		finally {
@@ -193,15 +209,6 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	/**
-	 * Get all the objects of a certain type.
-	 * 
-	 * This will probably mostly be used for debugging and test.
-	 * 
-	 */
-//	public <T> ArrayList<T> getAllObjects(Class<T> clazz) {
-//		return getAll(clazz);
-//	}
 	
 	/**
 	 * Generic method to get all objects of a certain type

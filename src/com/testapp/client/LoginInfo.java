@@ -2,6 +2,8 @@ package com.testapp.client;
 
 import java.io.Serializable;
 
+import com.testapp.client.pos.UserAccount;
+
 public class LoginInfo implements Serializable {
 
 	private boolean loggedIn = false;
