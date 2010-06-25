@@ -130,4 +130,17 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	public List<UserAccount> getUserAccounts() {
 		return UserAccountFactory.getInstance().getAll();
 	}
+	
+	public void generateTestData() {
+		UserAccountFactory.getInstance().newUserAccount("chad.walters@billnun.com", "555-555-5555", "cwalters", UserAccountStatus.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("trebor@billnun.com", "555-555-5555", "trebor", UserAccountStatus.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("triet@billnun.com", "555-555-5555", "triet", UserAccountStatus.PENDING);
+		UserAccountFactory.getInstance().newUserAccount("matt@billnun.com", "555-555-5555", "matt", UserAccountStatus.PENDING);
+		UserAccountFactory.getInstance().newUserAccount("austin@billnun.com", "555-555-5555", "austin", UserAccountStatus.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("leslie@billnun.com", "555-555-5555", "leslie", UserAccountStatus.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("bryan@billnun.com", "555-555-5555", "bryan", UserAccountStatus.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("damion@billnun.com", "555-555-5555", "damion", UserAccountStatus.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("pratt@billnun.com", "555-555-5555", "pratt", UserAccountStatus.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("graham@billnun.com", "555-555-5555", "graham", UserAccountStatus.ACCEPTED);
+	}
 }

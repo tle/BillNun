@@ -25,8 +25,7 @@ public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 		UserAccount account = null;
 		try {
 
-			account = new UserAccount(email, "xxx-xx-xxxx", 
-					"default_name"+System.currentTimeMillis(), status);
+			account = new UserAccount(email, phoneNumber, username, status);
 			account = pm.makePersistent(account);
 			return account;
 		} finally {
@@ -48,12 +47,12 @@ public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 	/**
 	 * Get all the UserAccounts with userIds that exist in the userIds list
 	 * 
-	 * @param userIds - list of all the user ids to look up.  It is the responsibility of the caller to makes sure there are no duplicates
+	 * @param userIds - list of all the user ids to look up.  Duplicates are okay as they are filtered out by the query.
 	 * @return
 	 */
 	public List<UserAccount> getUserAccounts(List<Long> userIds) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(UserAccount.class, "p.contains(id)");
+		Query query = pm.newQuery(UserAccount.class, ":p.contains(key)");
 		List<UserAccount> accounts = (List<UserAccount>) query.execute(userIds);
 		return wrapResults(accounts);
 	}

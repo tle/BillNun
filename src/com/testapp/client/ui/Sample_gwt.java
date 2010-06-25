@@ -1,5 +1,6 @@
 package com.testapp.client.ui;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -10,6 +11,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -45,6 +48,7 @@ public class Sample_gwt implements EntryPoint {
 	private TextBox phoneNumber = new TextBox();
 	private TextBox userName = new TextBox();
 	Button createUserAccount = new Button("create");
+	private HashMap<Long, CheckBox> friendshipMap = new HashMap<Long, CheckBox>();
 	
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting service.
@@ -131,7 +135,7 @@ public class Sample_gwt implements EntryPoint {
 				greetingService.addFriend(friendName.getText(), new AsyncCallback<Void>() {
 					public void onFailure(Throwable caught) {};
 					public void onSuccess(Void v) {
-						rebuildFriendsPanel();
+						refreshFriendStatus();
 					}
 				});
 			}
@@ -175,47 +179,64 @@ public class Sample_gwt implements EntryPoint {
 
 	private FlowPanel getFriendsPanel() {
 		final FlowPanel testPanel = new FlowPanel();
-		
-		//Test out Friend data store
+		final FlexTable allUsersTable = new FlexTable();
+		testPanel.add(allUsersTable);
+		// Get all the users in the system
 		greetingService.getUserAccounts(new AsyncCallback<List<UserAccount>>() {
 			@Override
 			public void onFailure(Throwable caught) {}
 			
 			public void onSuccess(List<UserAccount> result) {
+				int currentRow = 0;
 				for (final UserAccount account: result) {
-					Button addFriend = new Button("Become Friends with: " + account.getUserName() + " (" + account.getEmail() + ")");
-					testPanel.add(addFriend);
-					addFriend.addClickHandler(new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							greetingService.addFriend(account.getEmail(), new AsyncCallback<Void>() {
-								public void onFailure(Throwable caught) {};
-								public void onSuccess(Void v) {
-									rebuildFriendsPanel();
-								}
-							});
-						}
-					});
+					int currentColumn = 0;
+					
+					allUsersTable.setText(currentRow, currentColumn++, "" + account.getKey());
+					allUsersTable.setText(currentRow, currentColumn++, account.getUserName());
+					allUsersTable.setText(currentRow, currentColumn++, account.getPhoneNumber());
+					allUsersTable.setText(currentRow, currentColumn++, account.getEmail());
+					
+					CheckBox isFriend = new CheckBox("Friend?");
+					allUsersTable.setWidget(currentRow, currentColumn++, isFriend);
+					
+					friendshipMap.put(account.getKey(), isFriend);
+					
+					currentRow++;
+//					Button addFriend = new Button("Become Friends with: " + account.getUserName() + " (" + account.getEmail() + ")");
+//					testPanel.add(addFriend);
+//					addFriend.addClickHandler(new ClickHandler() {
+//						@Override
+//						public void onClick(ClickEvent event) {
+//							greetingService.addFriend(account.getEmail(), new AsyncCallback<Void>() {
+//								public void onFailure(Throwable caught) {};
+//								public void onSuccess(Void v) {
+//									rebuildFriendsPanel();
+//								}
+//							});
+//						}
+//					});
 				}
+				
+				
 			};
 		});
 		
-		rebuildFriendsPanel();
-		testPanel.add(friendsList);
+		refreshFriendStatus();
+		//rebuildFriendsPanel();
+		//testPanel.add(friendsList);
 		
 		return testPanel;
 	}
 	
-	private void rebuildFriendsPanel() {
+	private void refreshFriendStatus() {
 		greetingService.getFriends(new AsyncCallback<List<UserAccount>>() {
 			@Override
 			public void onFailure(Throwable caught) {}
 			
 			public void onSuccess(List<UserAccount> result) {
-				friendsList.clear();
-				friendsList.add(new Label("-MY FRIENDS ARE-"));
-				for (final UserAccount friend: result) {
-					friendsList.add(new Label(friend.getUserName()));
+				for(UserAccount account: result) {
+					CheckBox checkbox = friendshipMap.get(account.getKey());
+					checkbox.setValue(true);
 				}
 			};
 		});
