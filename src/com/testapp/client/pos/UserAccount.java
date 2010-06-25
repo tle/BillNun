@@ -9,6 +9,10 @@ import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable
 public class UserAccount implements Serializable {
+	
+	public enum UserAccountStatus {
+		PENDING , ACCEPTED ;
+	}
 
 	/**
 	 * 
@@ -27,6 +31,9 @@ public class UserAccount implements Serializable {
 	
 	@Persistent
 	private String userName="";
+	
+	@Persistent
+	private UserAccountStatus status;
 
 	public UserAccount() {
 		
@@ -34,10 +41,16 @@ public class UserAccount implements Serializable {
 	
 	public UserAccount( String email, String phoneNumber,
 			String userName) {
+		this (email,phoneNumber, userName, UserAccountStatus.ACCEPTED);
+	}
+	
+	public UserAccount(String email, String phoneNumber,
+			String userName, UserAccountStatus status) {
 		super();
 		this.email = email;
 		this.phoneNumber = phoneNumber;
 		this.userName = userName;
+		this.status = status;
 	}
 
 	public String getEmail() {
@@ -67,11 +80,20 @@ public class UserAccount implements Serializable {
 	public Long getKey() {
 		return key;
 	}
+	
+	public UserAccountStatus getStatus() {
+		return status;
+	}
+	
+	public void setStatus(UserAccountStatus status) {
+		this.status = status;
+	}
 
 	@Override
 	public String toString() {
 		return "UserAccount [email=" + email + ", key=" + key
 				+ ", phoneNumber=" + phoneNumber + ", userName=" + userName
+				+ ", status=" + status
 				+ "]";
 	}
 	

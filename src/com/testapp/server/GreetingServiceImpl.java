@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -47,11 +46,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 					"Name must be at least 4 characters long");
 		}
 		
-		PersistenceManagerFactory pmf = PMF.get();
-		
 		String serverInfo = getServletContext().getServerInfo();
 		String userAgent = getThreadLocalRequest().getHeader("User-Agent");
-		String tst = pmf.toString();
 		return "Hello, " + input + "!<br><br>I am running " + serverInfo
 				+ ".<br><br>It looks like you are using:<br>" + userAgent +"/n" ;
 	}
@@ -70,7 +66,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 			loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
 			
 			createEntryRecord(user);
-			createNewUserAccount(loginInfo);
+			createUserAccountPerLoginInfo(loginInfo);
 		} else {
 			//there already is an existed session
 			loginInfo.setLoggedIn(false);
@@ -83,82 +79,33 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		return loginInfo;
 	}
 	
-	private void createNewUserAccount(LoginInfo loginInfo) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String query = " select from " + UserAccount.class.getName() +" where email == '"+loginInfo.getEmailAddress()+"'" ;
-		List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(query).execute();
-		if (accounts.size() == 0) {
-			try {
-				//new user
-				loginInfo.setNewUser(true);
-				UserAccount account = new UserAccount(loginInfo.getEmailAddress(), "xxx-xx-xxxx", 
-						"default_name"+System.currentTimeMillis());
-				account = pm.makePersistent(account);
-				loginInfo.setAccount(account);
-				
-			} finally {
-				pm.close();
-			}
+	private void createUserAccountPerLoginInfo(LoginInfo loginInfo) {
+		
+		String emailAddress = loginInfo.getEmailAddress();
+		UserAccount account = UserAccountFactory.getInstance().getUserAccount(emailAddress);
+		if (account == null) {
+			account = UserAccountFactory.getInstance().newUserAccount(loginInfo.getEmailAddress(), 
+					"xxx-xx-xxxx", "default_name"+System.currentTimeMillis(), 
+					UserAccountStatus.ACCEPTED);
+			loginInfo.setNewUser(true);			
 		} else {
-			loginInfo.setAccount(accounts.get(0));//there should be only one
 			loginInfo.setNewUser(false);
 		}
-	}
-
-	/**
-	 * Get all the UserAccounts in the system
-	 * 
-	 * @return
-	 */
-	public List<UserAccount> getUserAccounts() {
-		return getAll(UserAccount.class);
-	}
+		loginInfo.setAccount(account);
+	}	
 	
 	private void createEntryRecord(User user) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		EntryRecord record  = new EntryRecord( user.getEmail(), new Date(System.currentTimeMillis()));
-		
-		try {
-			pm.makePersistent(record);
-		} finally {
-			pm.close();
-		}
+		EntryRecordFactory.getInstance().newEntryRecord(user);
 	}
 
 	@Override
 	public List<EntryRecord> getRecords() {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String query = "select from "+EntryRecord.class.getName();
-		List<EntryRecord> greetings = (List<EntryRecord>)pm.newQuery(query).execute();
-		List<EntryRecord> result = new ArrayList<EntryRecord>();
-		for (EntryRecord rec: greetings) {
-			result.add(rec);
-		}
+		List<EntryRecord> result = EntryRecordFactory.getInstance().getAll();
 		return result;
 	}
 	
-	public List<UserAccount> getFriends() {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(Friend.class);
-		q.setFilter("userId == userIdParam");
-		q.declareParameters("Long userIdParam");
-		
-		List<Friend> friends;
-		List<UserAccount> accounts = new ArrayList<UserAccount>();
-		try {
-			friends = (List<Friend>) pm.newQuery(q).execute(currentUser.getAccount().getKey());
-			for(Friend friend: friends) {
-				UserAccount friendAccount = pm.getObjectById(UserAccount.class, friend.getFriendAccountId());
-				if(friendAccount != null) {
-					accounts.add(friendAccount);
-				}
-			}
-			
-			return accounts;
-		}
-		finally {
-			q.closeAll();
-		}
+	public List<Friend> getFriends() {
+		return FriendFactory.getInstance().getFriendsOf(currentUser.getAccount().getKey());
 	}
 	
 	/**
@@ -168,95 +115,26 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	 * @param email
 	 */
 	public void addFriend(String email) {
-		//version 1 just add it to the table
-		// Find the user account with the email address
-		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(UserAccount.class);
-		q.setFilter("email == emailParam");
-		q.declareParameters("String emailParam");
-		
-		try{
-			List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(q).execute(email);
-			if(accounts.size()==0) {
-				//Need to send out Invite
-			} 
-			else if (accounts.size() ==1) {
-				UserAccount account = accounts.get(0);
-				
-				try {
-					q = pm.newQuery(Friend.class);
-					q.setFilter("friendAccountId == friendAccountIdParam");
-					q.declareParameters("long friendAccountIdParam");
-					List<Friend> friends = (List<Friend>)pm.newQuery(q).execute(account.getKey());
-					
-					Friend newFriend = new Friend();
-					newFriend.setUserId(currentUser.getAccount().getKey());
-					newFriend.setFriendAccountId(account.getKey());
-					newFriend.setBalance(0);
-					pm.makePersistent(newFriend);
-				}
-				finally {
-					pm.close();
-				}
-			}
-			else {
-				logger.log(Level.SEVERE, "There are more than one user accounts with the same email address:  " + accounts.toString());
-			}
-		}
-		finally {
-			q.closeAll();
-		}
-	}
-	
-	
-	/**
-	 * Generic method to get all objects of a certain type
-	 * 
-	 * @param <T>
-	 * @return
-	 */
-	private <T> ArrayList<T> getAll(Class<T> clazz) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(clazz);
-		
-		List<T> objects;
-		try {
-			objects = (List<T>) pm.newQuery(q).execute();
-			return wrapResults(objects);
-		}
-		finally {
-			q.closeAll();
-		}
+		FriendFactory.getInstance().addFriend(currentUser.getAccount().getKey(), email);
 	}
 	
 	/**
-	 * Iterates through result set and puts it into an ArrayList.
+	 * Get all the objects of a certain type.
 	 * 
-	 * Should be used after a query execute call.
+	 * This will probably mostly be used for debugging and test.
 	 * 
-	 * @param <T>
-	 * @param results
-	 * @return
 	 */
-	private <T> ArrayList<T> wrapResults(List<T> results) {
-		ArrayList<T> resultList = new ArrayList<T>();
-		for(T result: results) {
-			resultList.add(result);
-		}
-		return resultList;
-	}
+//	public <T> ArrayList<T> getAllObjects(Class<T> clazz) {
+//		return getAll(clazz);
+//	}
 
 	@Override
 	public void updateUserAccount(UserAccount account) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		try {
-			UserAccount acc = pm.getObjectById(UserAccount.class, account.getKey());
-			acc.setEmail(account.getEmail());
-			acc.setPhoneNumber(account.getPhoneNumber());
-			acc.setUserName(account.getUserName());
-		} finally {
-			pm.close();
-		}
+		UserAccountFactory.getInstance().save(account);
+	}
+
+	@Override
+	public List<UserAccount> getUserAccounts() {
+		return UserAccountFactory.getInstance().getAll();
 	}
 }
