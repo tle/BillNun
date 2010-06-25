@@ -1,5 +1,6 @@
 package com.testapp.server.jdo;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -8,9 +9,9 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import com.testapp.client.Friend;
-import com.testapp.client.UserAccount;
-import com.testapp.client.UserAccount.UserAccountStatus;
+import com.testapp.client.pos.Friend;
+import com.testapp.client.pos.UserAccount;
+import com.testapp.client.pos.UserAccount.UserAccountStatus;
 
 public class FriendFactory extends PersistentObjectFactory<Friend> {
 	
@@ -23,7 +24,6 @@ public class FriendFactory extends PersistentObjectFactory<Friend> {
 	}
 	
 	public FriendFactory() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
@@ -31,22 +31,18 @@ public class FriendFactory extends PersistentObjectFactory<Friend> {
 		return Friend.class;
 	}
 	
-	public List<Friend> getFriendsOf(Long userKey) {
+	public List<UserAccount> getFriendsOf(Long userKey) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
-		Query q1 = pm.newQuery(Friend.class);
+		// Get all the account ids of the friends
+		Query q1 = pm.newQuery("select friendAccountId from " + Friend.class.getName());
 		q1.setFilter("userId == userIdParam");
-		q1.declareParameters("Long userIdParam");		
-		
-		Query q2 = pm.newQuery(Friend.class);
-		q2.setFilter("friendUserId == userIdParam");
-		q2.declareParameters("Long userIdParam");
+		q1.declareParameters("Long userIdParam");
 				
 		try {
-			List<Friend> friends1 = wrapResults((List<Friend>) pm.newQuery(q1).execute(userKey));
-			List<Friend> friends2 = wrapResults((List<Friend>) pm.newQuery(q2).execute(userKey));
-			friends1.addAll(friends2);
-			return friends1;
+			List<Long> friendUserIds = (List<Long>) pm.newQuery(q1).execute(userKey);
+			// Look up all the user account objects with the given friendUserIds
+			return UserAccountFactory.getInstance().getUserAccounts(friendUserIds);
 		}
 		finally {
 			q1.closeAll();
@@ -77,7 +73,7 @@ public class FriendFactory extends PersistentObjectFactory<Friend> {
 					UserAccount account = accounts.get(0);
 					Friend newFriend = new Friend();
 					newFriend.setUserId(userId);
-					newFriend.setFriendUserId(account.getKey());
+					newFriend.setFriendAccountId(account.getKey());
 					newFriend.setBalance(0);
 					pm.makePersistent(newFriend);
 				}

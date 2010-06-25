@@ -3,9 +3,10 @@ package com.testapp.server.jdo;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
-import com.testapp.client.UserAccount;
-import com.testapp.client.UserAccount.UserAccountStatus;
+import com.testapp.client.pos.UserAccount;
+import com.testapp.client.pos.UserAccount.UserAccountStatus;
 
 public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 	
@@ -42,6 +43,19 @@ public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	 * Get all the UserAccounts with userIds that exist in the userIds list
+	 * 
+	 * @param userIds - list of all the user ids to look up.  It is the responsibility of the caller to makes sure there are no duplicates
+	 * @return
+	 */
+	public List<UserAccount> getUserAccounts(List<Long> userIds) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(UserAccount.class, "p.contains(id)");
+		List<UserAccount> accounts = (List<UserAccount>) query.execute(userIds);
+		return wrapResults(accounts);
 	}
 	
 	public void save(UserAccount account) {

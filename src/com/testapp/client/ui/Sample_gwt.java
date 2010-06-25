@@ -20,7 +20,7 @@ import com.testapp.client.LoginInfo;
 import com.testapp.client.api.GreetingService;
 import com.testapp.client.api.GreetingServiceAsync;
 import com.testapp.client.pos.UserAccount;
-import com.testapp.client.UserAccount.UserAccountStatus
+import com.testapp.client.pos.UserAccount.UserAccountStatus;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.

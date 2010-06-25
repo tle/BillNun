@@ -1,22 +1,15 @@
 package com.testapp.server;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
-
-import javax.jdo.PersistenceManager;
-import javax.jdo.PersistenceManagerFactory;
-import javax.jdo.Query;
-
 import com.testapp.client.LoginInfo;
 import com.testapp.client.api.GreetingService;
 import com.testapp.client.pos.EntryRecord;
-import com.testapp.client.pos.Friend;
 import com.testapp.client.pos.UserAccount;
-import com.testapp.server.jdo.PMF;
+import com.testapp.client.pos.UserAccount.UserAccountStatus;
+import com.testapp.server.jdo.EntryRecordFactory;
+import com.testapp.server.jdo.FriendFactory;
+import com.testapp.server.jdo.UserAccountFactory;
 import com.testapp.shared.FieldVerifier;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -104,7 +97,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		return result;
 	}
 	
-	public List<Friend> getFriends() {
+	public List<UserAccount> getFriends() {
 		return FriendFactory.getInstance().getFriendsOf(currentUser.getAccount().getKey());
 	}
 	
