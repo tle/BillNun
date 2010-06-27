@@ -1,10 +1,20 @@
 <project>
   	<property file="build.properties" />
   	<import file="${appengine.sdk.dir}/config/user/ant-macros.xml" />
-
+	
+	<property name="war.dir" location="war_test"/>
+	
+	<target name="init">
+		<mkdir dir="${war.dir}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${war.dir}" />
+	</target>
+	
 	<path id="project.classpath">
-	    <pathelement path="war/WEB-INF/classes" />
-	    <fileset dir="war/WEB-INF/lib">
+	    <pathelement path="${war.dir}/WEB-INF/classes" />
+	    <fileset dir="${war.dir}/WEB-INF/lib">
 	      <include name="**/*.jar" />
 	    </fileset>
 	    <fileset dir="${appengine.sdk.dir}/lib">
@@ -12,21 +22,29 @@
 	    </fileset>
 	  </path>
 	
-	<target name="copyjars"
+	<target name="copyjars" depends="init"
 	      description="Copies the App Engine JARs to the WAR.">
 	    <copy
-	        todir="war/WEB-INF/lib"
+	        todir="${war.dir}/WEB-INF/lib"
 	        flatten="true">
 	      <fileset dir="${appengine.sdk.dir}/lib/user">
 	        <include name="**/*.jar" />
 	      </fileset>
 	    </copy>
 		<copy
-	        todir="war/WEB-INF/lib"
+	        todir="${war.dir}/WEB-INF/lib"
 	        flatten="true">
 	      <fileset dir="${gwt.sdk.dir}">
 	        <include name="gwt-servlet.jar" />
 	      </fileset>
 	    </copy>
 	  </target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: compile                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="compile">
+            
+    </target>
+
 </project>
