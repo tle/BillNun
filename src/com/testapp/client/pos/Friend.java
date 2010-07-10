@@ -27,7 +27,7 @@ public class Friend implements Serializable{
 	private Long friendAccountId;
 
 	@Persistent
-	private int balance;
+	private double balance;
 	
 	public Long getKey() {
 		return key;
@@ -53,11 +53,11 @@ public class Friend implements Serializable{
 		this.friendAccountId = friendAccountId;
 	}
 
-	public int getBalance() {
+	public double getBalance() {
 		return balance;
 	}
 
-	public void setBalance(int balance) {
+	public void setBalance(double balance) {
 		this.balance = balance;
 	}
 	

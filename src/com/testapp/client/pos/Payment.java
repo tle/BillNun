@@ -34,6 +34,9 @@ public class Payment implements Serializable{
 	@Persistent
 	private Date date;
 	
+	@Persistent
+	private String description = "";
+	
 	public Long getKey() {
 		return key;
 	}
@@ -74,5 +77,12 @@ public class Payment implements Serializable{
 		this.date = date;
 	}
 	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
 	
 }

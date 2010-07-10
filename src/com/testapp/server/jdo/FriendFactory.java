@@ -1,11 +1,13 @@
 package com.testapp.server.jdo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -59,18 +61,24 @@ public class FriendFactory extends PersistentObjectFactory<Friend> {
 		
 		try{
 			List<UserAccount> accounts = (List<UserAccount>)pm.newQuery(q).execute(email);
+			UserAccount account = null;
 			if(accounts.size()==0) {
 				//TODO Need to send out Invite
 				
 				//for now we will create a user account with a PENDING status
-				UserAccount newAccount =
+				account =
 					UserAccountFactory.getInstance().newUserAccount(email, "xxx-xx-xxxx",
 							"default_name"+System.currentTimeMillis(), 
 							UserAccountStatus.PENDING);
 			} 
 			else if (accounts.size() ==1) {
+				account = accounts.get(0);
+			}
+			else {
+				logger.log(Level.SEVERE, "There are two user accounts with the same email address:  " + accounts.toString());
+			}
+			if (account!=null) {
 				try {
-					UserAccount account = accounts.get(0);
 					Friend newFriend = new Friend();
 					newFriend.setUserId(userId);
 					newFriend.setFriendAccountId(account.getKey());
@@ -81,12 +89,42 @@ public class FriendFactory extends PersistentObjectFactory<Friend> {
 					pm.close();
 				}
 			}
-			else {
-				logger.log(Level.SEVERE, "There are two user accounts with the same email address:  " + accounts.toString());
-			}
 		}
 		finally {
 			q.closeAll();
+		}
+	}
+	
+	public void updateBalance (Long userId, Long friendAccountId, double newBalance) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Extent<Friend> extent = pm.getExtent(Friend.class, false);
+
+			String filter =
+				"userId == user && friendAccountId == friendAccount";
+			Query query = pm.newQuery(extent, filter);
+			query.declareParameters("Long user, Long friendAccount");     
+
+
+			Collection<Friend> friends = 
+				(Collection<Friend>)query.executeWithArray(userId, friendAccountId);
+
+			if (friends.size() > 0) {
+				//there should be only one
+				Friend friend = friends.iterator().next();
+				friend.setBalance(newBalance);								
+			}
+			
+//			friends =
+//				(Collection<Friend>)query.executeWithArray( friendAccountId, userId);
+//			if (friends.size() > 0) {
+//				//there should be only one
+//				Friend friend = friends.iterator().next();
+//				friend.setBalance(-1*newBalance);								
+//			}
+			
+		} finally {
+			pm.close();
 		}
 	}
 	
