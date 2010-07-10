@@ -1,5 +1,8 @@
 package com.testapp.server.jdo;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -53,6 +56,9 @@ public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 	public List<UserAccount> getUserAccounts(List<Long> userIds) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(UserAccount.class, ":p.contains(key)");
+		if (userIds.size() == 0) {
+			return  new ArrayList<UserAccount>();
+		}
 		List<UserAccount> accounts = (List<UserAccount>) query.execute(userIds);
 		return wrapResults(accounts);
 	}
