@@ -63,18 +63,7 @@ public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 		return wrapResults(accounts);
 	}
 	
-	public void save(UserAccount account) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		try {
-			UserAccount acc = pm.getObjectById(UserAccount.class, account.getKey());
-			acc.setEmail(account.getEmail());
-			acc.setPhoneNumber(account.getPhoneNumber());
-			acc.setUserName(account.getUserName());
-		} finally {
-			pm.close();
-		}
-	}
-
+	
 	@Override
 	protected Class<UserAccount> getObjectClass() {
 		return UserAccount.class;

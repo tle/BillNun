@@ -9,11 +9,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-/**
- * @author Bryan
- */
-
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class Payment implements Serializable{
 	
 	private static final long serialVersionUID = 1L;

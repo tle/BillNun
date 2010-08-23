@@ -17,7 +17,7 @@ public class PaymentFactory extends PersistentObjectFactory<Payment> {
 		FriendshipImpl.newInstance();
 	
 	@Override
-	protected Class getObjectClass() {
+	protected Class<Payment> getObjectClass() {
 		return Payment.class;
 	}
 	

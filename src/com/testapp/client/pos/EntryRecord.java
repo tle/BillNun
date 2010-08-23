@@ -8,14 +8,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-/**
- * ss
- * I have no idea what's going on
- * @author tle
- *
- */
-
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class EntryRecord implements Serializable{
 	
 	/**   a nother change
