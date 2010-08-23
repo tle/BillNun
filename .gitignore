@@ -2,4 +2,3 @@ war/WEB-INF/classes
 war/sample_gwt
 war/WEB-INF/appengine-generated/
 build.properties
-war/WEB-INF/lib/*.jar
