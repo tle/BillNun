@@ -2,11 +2,6 @@ package com.testapp.server.jdo;
 
 import java.util.Collection;
 
-import javax.jdo.JDOObjectNotFoundException;
-import javax.jdo.PersistenceManager;
-import javax.jdo.Transaction;
-
-import org.apache.commons.lang.NotImplementedException;
 
 import com.testapp.client.pos.UserGroup;
 
