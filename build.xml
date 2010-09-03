@@ -1,27 +1,24 @@
-<project>
+<project default="build">
 	<property file="build.properties" />
 	  	
 	<import file="${appengine.sdk.dir}/config/user/ant-macros.xml" />
 	
 	<property name="war.dir" location="war"/>
 	
-	<target name="clean">
-		<!-- TODO: change this to whatever we end up calling the sample_gwt app -->
-		<delete dir="${war.dir}/sample_gwt"/>
-		<delete dir="${war.dir}/WEB-INF/lib"/>
-		<delete dir="${war.dir}/WEB-INF/classes"/>
-		<delete dir="${war.dir}/WEB-INF/appengine-generated"/>
-	</target>
-	
 	<path id="project.classpath">
 	    <pathelement path="${war.dir}/WEB-INF/classes" />
-	    <fileset dir="${war.dir}/WEB-INF/lib">
+	    
+		<fileset dir="${war.dir}/WEB-INF/lib">
 	      <include name="**/*.jar" />
 	    </fileset>
-	    <fileset dir="${appengine.sdk.dir}/lib">
+	    
+		<fileset dir="${appengine.sdk.dir}/lib">
 	      <include name="shared/**/*.jar" />
 	    </fileset>
-	  </path>
+		
+		<pathelement location="${gwt.sdk.dir}/gwt-user.jar"/>
+		<fileset dir="${gwt.sdk.dir}" includes="gwt-dev*.jar"/>
+	</path>
 	
 	<target name="copyjars" description="Copies all the needed runtime jars into the war">
 	    <!-- Clear the lib folder before copying jars in -->
@@ -74,7 +71,42 @@
 	    destdir="${war.dir}/WEB-INF/classes"
 	    classpathref="project.classpath"
 	    debug="on" />
+	</target>
 
+    <target name="gwt-compile" depends="compile" description="GWT compile to JavaScript">
+	    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+	      <classpath>
+	        <pathelement location="src"/>
+	        <path refid="project.classpath"/>
+	      </classpath>
+	      <!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
+	      <jvmarg value="-Xmx256M"/>
+	      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+	      <arg line="-style PRETTY"/>
+	      <arg value="com.testapp.Sample_gwt"/>
+	    </java>
+	  </target>
+
+  <target name="devmode" depends="compile" description="Run development mode">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.DevMode">
+      <classpath>
+        <pathelement location="src"/>
+        <path refid="project.classpath"/>
+      </classpath>
+      <jvmarg value="-Xmx256M"/>
+      <arg value="-startupUrl"/>
+      <arg value="Sample_gwt.html"/>
+      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+      <arg value="com.testapp.Sample_gwt"/>
+    </java>
   </target>
-
+	
+   <target name="build" depends="gwt-compile" description="Build this project" />
+	
+	<target name="clean" description="Clean">
+		<delete dir="${war.dir}/sample_gwt"/>
+		<delete dir="${war.dir}/WEB-INF/lib"/>
+		<delete dir="${war.dir}/WEB-INF/classes"/>
+		<delete dir="${war.dir}/WEB-INF/appengine-generated"/>
+	</target>
 </project>
