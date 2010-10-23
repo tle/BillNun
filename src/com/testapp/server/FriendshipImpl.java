@@ -10,41 +10,28 @@ public class FriendshipImpl implements FriendshipAPI {
 	public static FriendshipAPI newInstance() {
 		return new FriendshipImpl();
 	}
-	
-	@Override
-	public UserAccount addFriendship(long userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public UserAccount addFriendshipByEmail(String email) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public List<UserAccount> getFriends(long userId) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-	@Override
-	public List<UserAccount> getFriends(long userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public UserAccount addFriendship(long userId) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-	@Override
-	public boolean isFriend(long userId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    public UserAccount removeFriendship(long userId) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-	@Override
-	public UserAccount removeFriendship(long userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public UserAccount addFriendshipByEmail(String email) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-	@Override
-	public UserAccount removeFriendshipByEmail(String email) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public UserAccount removeFriendshipByEmail(String email) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
+    public boolean isFriend(long userId) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

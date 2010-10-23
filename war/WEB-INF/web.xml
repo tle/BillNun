@@ -21,4 +21,26 @@
     <welcome-file>Sample_gwt.html</welcome-file>
   </welcome-file-list>
 
+	<servlet>
+		<servlet-name>billnun.rest</servlet-name>
+		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>com.sun.jersey.config.property.packages</param-name>
+			<param-value>com.testapp.server.rest</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+    <servlet>
+        <servlet-name>com.testapp.Sample_gwt GreetingService</servlet-name>
+        <servlet-class>com.testapp.server.GreetingServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+		<servlet-name>billnun.rest</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>com.testapp.Sample_gwt GreetingService</servlet-name>
+        <url-pattern>/sample_gwt/greet</url-pattern>
+    </servlet-mapping>
+
 </web-app>

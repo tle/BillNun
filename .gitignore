@@ -1,4 +1,6 @@
 war/WEB-INF/classes
 war/sample_gwt
 war/WEB-INF/appengine-generated/
-build.properties/lib
+test-classes
+build.properties
+/lib

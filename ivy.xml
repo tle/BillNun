@@ -2,11 +2,17 @@
     <info organisation="com.billnun" module="billnun"/>
     <!-- To exclude javadoc, add !javadoc to the defaultconf-->
     <dependencies defaultconf="*->*,!sources">
+        <dependency org="junit" name="junit" rev="4.8.1"/>
+        
         <dependency org="com.google.appengine" name="appengine-java-sdk" rev="${gae-version}"/>
+        
         <dependency org="com.google.gwt" name="gwt-api-checker" rev="2.0.0"/>
         <dependency org="com.google.gwt" name="gwt-soyc-vis" rev="${gwt-version}"/>
         <dependency org="com.google.gwt" name="gwt-user" rev="${gwt-version}"/>
         <dependency org="com.google.gwt" name="gwt-dev" rev="${gwt-version}"/>
         <dependency org="com.google.gwt" name="gwt-servlet" rev="${gwt-version}" />
-    </dependencies>
+        
+        <dependency org="com.sun.jersey" name="jersey-archive" rev="1.1.5" />
+        
+	</dependencies>
 </ivy-module>

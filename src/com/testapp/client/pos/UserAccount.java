@@ -6,7 +6,13 @@ import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement(name="userAccount")
+@XmlAccessorType(XmlAccessType.FIELD)
 @PersistenceCapable(detachable="true")
 public class UserAccount implements Serializable {
 	
@@ -18,20 +24,25 @@ public class UserAccount implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
+    @XmlElement(name="key")
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long key;
-	
+
+    @XmlElement(name="email")
 	@Persistent
 	private String email="";
-	
+
+    @XmlElement(name="phoneNumber")
 	@Persistent
 	private String phoneNumber="";
-	
+
+    @XmlElement(name="username")
 	@Persistent
 	private String userName="";
-	
+
+    @XmlElement(name="status")
 	@Persistent
 	private UserAccountStatus status;
 

@@ -57,7 +57,6 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 				+ ".<br><br>It looks like you are using:<br>" + userAgent +"/n" ;
 	}
 	
-	@Override
 	public LoginInfo login(String requestUri) {
 		this.currentUser = null; // Go ahead an invalidate the current user whenever we get a login request
 		UserService userService = UserServiceFactory.getUserService();
@@ -103,7 +102,6 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		EntryRecordFactory.getInstance().newEntryRecord(user);
 	}
 
-	@Override
 	public List<EntryRecord> getRecords() {
 		List<EntryRecord> result = EntryRecordFactory.getInstance().getAll();
 		return result;
@@ -123,27 +121,22 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		FriendFactory.getInstance().addFriend(currentUser.getAccount().getKey(), email);
 	}
 
-	@Override
 	public void addUsersToGroup(long groupId, Collection<Long> users) {
 		GroupFactory.getInstance().addUsersToGroup(groupId, users);
 	}
-	
-	@Override
+
 	public Collection<Long> getGroupMembers(long groupId) {
 		return GroupFactory.getInstance().getGroupMembers(groupId);
 	}
-	
-	@Override
+
 	public boolean isMemberOf(long groupId, long userId) {
 		return GroupFactory.getInstance().isMemberOf(groupId, userId);
 	}
-	
-	@Override
+
 	public void updateUserAccount(UserAccount account) {
 		UserAccountFactory.getInstance().save(account);
 	}
 
-	@Override
 	public List<UserAccount> getUserAccounts() {
 		return UserAccountFactory.getInstance().getAll();
 	}
