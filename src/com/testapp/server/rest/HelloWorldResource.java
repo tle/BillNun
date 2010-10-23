@@ -3,6 +3,7 @@ package com.testapp.server.rest;
 import com.testapp.client.pos.UserAccount;
 import com.testapp.server.jdo.FriendFactory;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
@@ -36,4 +37,5 @@ public class HelloWorldResource {
     public List<UserAccount> getJson() {
         return fakeUsers;
     }
+
 }

@@ -1,46 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
+        PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd">
 
-<web-app>
-  
-  <!-- Servlets -->
-  <servlet>
-    <servlet-name>greetServlet</servlet-name>
-    <servlet-class>com.testapp.server.GreetingServiceImpl</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>greetServlet</servlet-name>
-    <url-pattern>/sample_gwt/greet</url-pattern>
-  </servlet-mapping>
-  
-  <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>Sample_gwt.html</welcome-file>
-  </welcome-file-list>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
 
-	<servlet>
-		<servlet-name>billnun.rest</servlet-name>
-		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-		<init-param>
-			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>com.testapp.server.rest</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+    <display-name>Billnun</display-name>
+    <description>Billnun</description>
+
+    <!-- Default page to serve -->
+    <welcome-file-list>
+        <welcome-file>Sample_gwt.html</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/errors/servererror.jsp</location>
+    </error-page>
+
+    <!-- Servlets -->
     <servlet>
-        <servlet-name>com.testapp.Sample_gwt GreetingService</servlet-name>
+        <servlet-name>greetServlet</servlet-name>
         <servlet-class>com.testapp.server.GreetingServiceImpl</servlet-class>
     </servlet>
+
     <servlet-mapping>
-		<servlet-name>billnun.rest</servlet-name>
-		<url-pattern>/rest/*</url-pattern>
-	</servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>com.testapp.Sample_gwt GreetingService</servlet-name>
+        <servlet-name>greetServlet</servlet-name>
         <url-pattern>/sample_gwt/greet</url-pattern>
     </servlet-mapping>
+
+    <!--Rest API Servlet-->
+    <servlet>
+        <servlet-name>RestAPI</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.testapp.server.rest</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RestAPI</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+
+    <!--Security-->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Rest API</web-resource-name>
+            <url-pattern>/rest/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Admin</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
 
 </web-app>
