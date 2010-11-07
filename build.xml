@@ -1,11 +1,15 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" default="build">
 	<property file="build.properties" />
 
-	<!-- war directory-->
+	<!-- war directory -->
 	<property name="war.dir" location="war"/>
 
 	<!-- Ivy dependencies are put here -->
 	<property name="lib.dir" location="lib"/>
+	
+	<property name="target.dir" location="target"/>
+	
+	<property name="test.classes.dir" location="test-classes"/>
 	
 	<!-- Used in ivy.xml -->
 	<property name="gwt-version" value="2.0.4" />
@@ -36,6 +40,34 @@
 		<pathelement location="${lib.dir}/jsr311-api.jar"/>
 	</path>
 
+	<path id="project.test.classpath">
+		<pathelement path="${war.dir}/WEB-INF/classes" />
+	
+		<fileset dir="${war.dir}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+
+		<fileset dir="${gae.sdk.dir}/lib">
+			<include name="shared/**/*.jar" />
+		</fileset>
+
+		<fileset dir="${gae.sdk.dir}/lib/testing">
+			<include name="**/*.jar" />
+		</fileset>
+		
+		<pathelement location="${lib.dir}/jsr311-api.jar"/>
+	</path>
+	
+	<path id="run.test.classpath">
+		<fileset dir="${target.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${gae.sdk.dir}/lib">
+			<include name="**/*.jar" />
+			<exclude name="tools/**/*.jar"/>
+		</fileset>
+	</path>
+	
 	<!-- Dependencies Management -->
     <target name="resolve" description="--> retrieve dependencies with ivy">
         <ivy:retrieve pattern="${lib.dir}/[artifact](-[classifier]).[ext]" />
@@ -102,7 +134,50 @@
 	    classpathref="project.classpath"
 	    debug="on" />
 	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: package                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="package" depends="compile">    	
+    	<jar destfile="${target.dir}/billNun.jar">
+    		<fileset dir="${war.dir}/WEB-INF/classes"/>
+    	</jar>        
+    </target>
 
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: compileTest                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="compileTest">
+    	<mkdir dir="${test.classes.dir}" />
+		<javac
+		    srcdir="test"
+		    destdir="${test.classes.dir}"
+		    classpathref="project.test.classpath"
+		    debug="on" />    
+    </target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: packageTest                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="packageTest" depends="compileTest">
+    	<jar destfile="${target.dir}/billNunTest.jar">
+    	   	<fileset dir="${test.classes.dir}"/>
+     	</jar>    
+    </target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: test                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="test" depends="packageTest">
+	    <junit>
+	      <classpath refid="run.test.classpath" />
+	      <formatter type="brief" usefile="false" />
+	      <test name="${test.name}" />
+	    </junit> 
+    </target>
+
+	
 	<target name="gwt-compile" depends="compile" description="GWT compile to JavaScript">
 		<java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
 			<classpath>
