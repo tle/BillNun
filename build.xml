@@ -148,7 +148,7 @@
 	<!-- - - - - - - - - - - - - - - - - - 
           target: compileTest                      
          - - - - - - - - - - - - - - - - - -->
-    <target name="compileTest">
+    <target name="compileTest" depends="package">
     	<mkdir dir="${test.classes.dir}" />
 		<javac
 		    srcdir="test"
