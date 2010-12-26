@@ -14,11 +14,11 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.testapp.client.pos.UserAccount;
 import com.testapp.server.DebtShufflingCore;
-import com.testapp.server.DebtShufflingCore.Edge;
-import com.testapp.server.DebtShufflingCore.Graph;
+import com.testapp.server.Graph;
+import com.testapp.server.Graph.Edge;
 
 public class DebtShufflingTest extends TestCase {
-	
+	                               
     private final LocalServiceTestHelper helper =
         new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
@@ -43,24 +43,25 @@ public class DebtShufflingTest extends TestCase {
 		Edge edgeDA = DebtShufflingCore.createEdge(userD.getKey(), userA.getKey(), 15);
 		Edge edgeEB = DebtShufflingCore.createEdge(userE.getKey(), userB.getKey(), 20);
 		Edge edgeDE = DebtShufflingCore.createEdge(userD.getKey(), userE.getKey(), 50);
-		Edge edgeCD = DebtShufflingCore.createEdge(userC.getKey(), userD.getKey(), 20);
+		Edge edgeCD = DebtShufflingCore.createEdge(userC.getKey(), userD.getKey(), 25);
 		
-		Graph graph = new Graph() {
-			@Override
-			public Set<Edge> shuffle() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		};
+		Graph graph = new DebtShufflingCore.MinTransactionShuffleGraph();
 		graph.addEdge(edgeCD);
 		graph.addEdge(edgeDE);
 		graph.addEdge(edgeEB);
 		graph.addEdge(edgeDA);
 		graph.addEdge(edgeAB);
+
+        String str = "";
+
+
 		
-		Set<Map.Entry<Long, Integer>> networths = graph.getNetWorths();
+/*		Set<Map.Entry<Long, Integer>> networths = graph.getNetWorths();      
 		
-		assertValidNetworthsSet(networths);
+		assertValidNetworthsSet(networths);*/
+		
+		graph.shuffle();
+		
 	}
 	
 	private void assertValidNetworthsSet(Set<Map.Entry<Long, Integer>> networths) {

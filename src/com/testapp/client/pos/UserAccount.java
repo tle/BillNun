@@ -45,7 +45,7 @@ public class UserAccount implements Serializable {
     @XmlElement(name="status")
 	@Persistent
 	private UserAccountStatus status;
-
+       
 	public UserAccount() {
 		
 	}
