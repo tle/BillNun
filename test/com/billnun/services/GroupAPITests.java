@@ -5,11 +5,12 @@ import java.util.Collections;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.testapp.client.pos.UserAccount;
-import com.testapp.client.pos.UserGroup;
+import com.testapp.client.dto.UserAccountDto;
+import com.testapp.client.dto.UserGroup;
 import com.testapp.server.jdo.GroupFactory;
 import com.testapp.server.jdo.UserAccountFactory;
 
+import com.testapp.server.po.UserAccount;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class GroupAPITests {
     	
     	for(int i=0;i<5;i++) {
     		String name = "User_" + System.currentTimeMillis();
-    		UserAccount u = new UserAccount(name + "@billnun.test.com", "555-555-5555", name);
+    		UserAccount u = new UserAccount(name + "@billnun.test.com", "555-555-5555", name, UserAccount.Status.ACCEPTED);
     		UserAccountFactory.getInstance().save(u);
     		group.addMembers(Collections.singleton(u.getKey()));
     	}

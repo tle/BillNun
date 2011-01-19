@@ -22,8 +22,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.testapp.client.LoginInfo;
 import com.testapp.client.api.GreetingService;
 import com.testapp.client.api.GreetingServiceAsync;
-import com.testapp.client.pos.UserAccount;
-import com.testapp.client.pos.UserAccount.UserAccountStatus;
+import com.testapp.client.dto.UserAccountDto;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -154,27 +153,27 @@ public class Sample_gwt implements EntryPoint {
 	}
 
 	protected void updateAccount() {
-		final UserAccount account = loginInfo.getAccount();
-		account.setEmail(email.getText());
-		account.setPhoneNumber(phoneNumber.getText());
-		account.setUserName(userName.getText());
-		
-		if (UserAccountStatus.PENDING.equals(account.getStatus())) {
-			account.setStatus(UserAccountStatus.ACCEPTED);
-		}
-		
-		greetingService.updateUserAccount(account, new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public void onSuccess(Void result) {
-				Window.alert("Account created.");
-				
-			}
-		});
+//		final UserAccount account = loginInfo.getAccount();
+//		account.setEmail(email.getText());
+//		account.setPhoneNumber(phoneNumber.getText());
+//		account.setUserName(userName.getText());
+//
+//		if (UserAccountDto.Status.PENDING.equals(account.getStatus())) {
+//			account.setStatus(UserAccountDto.Status.ACCEPTED);
+//		}
+//
+//		greetingService.updateUserAccount(account, new AsyncCallback<Void>() {
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				// TODO Auto-generated method stub
+//
+//			}
+//			@Override
+//			public void onSuccess(Void result) {
+//				Window.alert("Account created.");
+//
+//			}
+//		});
 	}
 
 	private FlowPanel getFriendsPanel() {
@@ -182,13 +181,13 @@ public class Sample_gwt implements EntryPoint {
 		final FlexTable allUsersTable = new FlexTable();
 		testPanel.add(allUsersTable);
 		// Get all the users in the system
-		greetingService.getUserAccounts(new AsyncCallback<List<UserAccount>>() {
+		greetingService.getUserAccounts(new AsyncCallback<List<UserAccountDto>>() {
 			@Override
 			public void onFailure(Throwable caught) {}
 			
-			public void onSuccess(List<UserAccount> result) {
+			public void onSuccess(List<UserAccountDto> result) {
 				int currentRow = 0;
-				for (final UserAccount account: result) {
+				for (final UserAccountDto account: result) {
 					int currentColumn = 0;
 					
 					allUsersTable.setText(currentRow, currentColumn++, "" + account.getKey());
@@ -229,12 +228,12 @@ public class Sample_gwt implements EntryPoint {
 	}
 	
 	private void refreshFriendStatus() {
-		greetingService.getFriends(new AsyncCallback<List<UserAccount>>() {
+		greetingService.getFriends(new AsyncCallback<List<UserAccountDto>>() {
 			@Override
 			public void onFailure(Throwable caught) {}
 			
-			public void onSuccess(List<UserAccount> result) {
-				for(UserAccount account: result) {
+			public void onSuccess(List<UserAccountDto> result) {
+				for(UserAccountDto account: result) {
 					CheckBox checkbox = friendshipMap.get(account.getKey());
 					checkbox.setValue(true);
 				}

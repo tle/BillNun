@@ -1,15 +1,13 @@
 package com.testapp.server.jdo;
 
+import com.testapp.server.po.UserAccount;
+
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import com.testapp.client.pos.UserAccount;
-import com.testapp.client.pos.UserAccount.UserAccountStatus;
 
 public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 	
@@ -23,7 +21,7 @@ public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public UserAccount newUserAccount(String email, String phoneNumber, String username, UserAccountStatus status ) {
+	public UserAccount newUserAccount(String email, String phoneNumber, String username, UserAccount.Status status ) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		UserAccount account = null;
 		try {
@@ -35,7 +33,17 @@ public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 			pm.close();
 		}
 	}
-	
+
+    public UserAccount newUserAccount(UserAccount userAccount) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+        	UserAccount ua = pm.makePersistent(userAccount);
+            return pm.detachCopy(ua);
+		} finally {
+			pm.close();
+		}
+	}
+
 	public UserAccount getUserAccount(String email) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		String query = " select from " + UserAccount.class.getName() +" where email == '"+email+"'" ;
@@ -68,6 +76,4 @@ public class UserAccountFactory extends PersistentObjectFactory<UserAccount> {
 	protected Class<UserAccount> getObjectClass() {
 		return UserAccount.class;
 	}
-	
-	
 }

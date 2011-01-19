@@ -12,16 +12,16 @@ import com.testapp.client.LoginInfo;
 import com.testapp.client.api.GreetingService;
 import com.testapp.client.api.GroupAPI;
 import com.testapp.client.api.PaymentAPI;
-import com.testapp.client.pos.EntryRecord;
-import com.testapp.client.pos.Payment;
-import com.testapp.client.pos.UserAccount;
-import com.testapp.client.pos.UserGroup;
-import com.testapp.client.pos.UserAccount.UserAccountStatus;
+import com.testapp.client.dto.EntryRecord;
+import com.testapp.client.dto.Payment;
+import com.testapp.client.dto.UserAccountDto;
+import com.testapp.client.dto.UserAccountDto.Status;
 import com.testapp.server.jdo.EntryRecordFactory;
 import com.testapp.server.jdo.FriendFactory;
 import com.testapp.server.jdo.GroupFactory;
 import com.testapp.server.jdo.PMF;
 import com.testapp.server.jdo.UserAccountFactory;
+import com.testapp.server.po.UserAccount;
 import com.testapp.shared.FieldVerifier;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -90,7 +90,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		if (account == null) {
 			account = UserAccountFactory.getInstance().newUserAccount(loginInfo.getEmailAddress(), 
 					"xxx-xx-xxxx", "default_name"+System.currentTimeMillis(), 
-					UserAccountStatus.ACCEPTED);
+					UserAccount.Status.ACCEPTED);
 			loginInfo.setNewUser(true);			
 		} else {
 			loginInfo.setNewUser(false);
@@ -143,14 +143,14 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	
 	/**
 	 * TODO: bc - might want to change this to a list of ids.  Otherwise we'd be required to pass the whole userAccount object around
-	 * Considering we are passing in a list of UserAccount, we can assume that they are registerd
+	 * Considering we are passing in a list of UserAccountDto, we can assume that they are registerd
 	 * @param whoPayed
 	 * @param participants
 	 * @param amount
 	 * @param transactionDate
 	 * @param description
 	 */
-	public void recordPayment (List<UserAccount> whoPayed , List<UserAccount> participants , 
+	public void recordPayment (List<UserAccountDto> whoPayed , List<UserAccountDto> participants ,
 			double amount , Date transactionDate , String description) {
 		
 		//TODO we really need to put shit in transaction 
@@ -168,8 +168,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 			payment.setDate(transactionDate);
 			
 			//update balances between friends
-			for (UserAccount payer : whoPayed) {
-				for (UserAccount payee : participants) {
+			for (UserAccountDto payer : whoPayed) {
+				for (UserAccountDto payee : participants) {
 					if (!payer.getKey().equals(payee.getKey())) {
 						FriendFactory.getInstance().updateBalance(
 								payer.getKey(), payee.getKey(), amount);
@@ -182,25 +182,25 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		}
 	}
 	
-	private List<Long> extractId(List<UserAccount> userAccountList) {
+	private List<Long> extractId(List<UserAccountDto> userAccountList) {
 		List<Long> idList = Collections.EMPTY_LIST;
-		for (UserAccount account : userAccountList) {
+		for (UserAccountDto account : userAccountList) {
 			idList.add(account.getKey());
 		}
 		return idList;
 	}
 	
 	public void generateTestData() {
-		UserAccountFactory.getInstance().newUserAccount("chad.walters@billnun.com", "555-555-5555", "cwalters", UserAccountStatus.ACCEPTED);
-		UserAccountFactory.getInstance().newUserAccount("trebor@billnun.com", "555-555-5555", "trebor", UserAccountStatus.ACCEPTED);
-		UserAccountFactory.getInstance().newUserAccount("triet@billnun.com", "555-555-5555", "triet", UserAccountStatus.PENDING);
-		UserAccountFactory.getInstance().newUserAccount("matt@billnun.com", "555-555-5555", "matt", UserAccountStatus.PENDING);
-		UserAccountFactory.getInstance().newUserAccount("austin@billnun.com", "555-555-5555", "austin", UserAccountStatus.ACCEPTED);
-		UserAccountFactory.getInstance().newUserAccount("leslie@billnun.com", "555-555-5555", "leslie", UserAccountStatus.ACCEPTED);
-		UserAccountFactory.getInstance().newUserAccount("bryan@billnun.com", "555-555-5555", "bryan", UserAccountStatus.ACCEPTED);
-		UserAccountFactory.getInstance().newUserAccount("damion@billnun.com", "555-555-5555", "damion", UserAccountStatus.ACCEPTED);
-		UserAccountFactory.getInstance().newUserAccount("pratt@billnun.com", "555-555-5555", "pratt", UserAccountStatus.ACCEPTED);
-		UserAccountFactory.getInstance().newUserAccount("graham@billnun.com", "555-555-5555", "graham", UserAccountStatus.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("chad.walters@billnun.com", "555-555-5555", "cwalters", UserAccount.Status.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("trebor@billnun.com", "555-555-5555", "trebor", UserAccount.Status.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("triet@billnun.com", "555-555-5555", "triet", UserAccount.Status.PENDING);
+		UserAccountFactory.getInstance().newUserAccount("matt@billnun.com", "555-555-5555", "matt", UserAccount.Status.PENDING);
+		UserAccountFactory.getInstance().newUserAccount("austin@billnun.com", "555-555-5555", "austin", UserAccount.Status.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("leslie@billnun.com", "555-555-5555", "leslie", UserAccount.Status.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("bryan@billnun.com", "555-555-5555", "bryan", UserAccount.Status.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("damion@billnun.com", "555-555-5555", "damion", UserAccount.Status.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("pratt@billnun.com", "555-555-5555", "pratt", UserAccount.Status.ACCEPTED);
+		UserAccountFactory.getInstance().newUserAccount("graham@billnun.com", "555-555-5555", "graham", UserAccount.Status.ACCEPTED);
 	}
 	
 	

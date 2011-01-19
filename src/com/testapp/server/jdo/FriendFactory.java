@@ -1,8 +1,6 @@
 package com.testapp.server.jdo;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,9 +9,9 @@ import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import com.testapp.client.pos.Friend;
-import com.testapp.client.pos.UserAccount;
-import com.testapp.client.pos.UserAccount.UserAccountStatus;
+import com.testapp.client.dto.Friend;
+import com.testapp.client.dto.UserAccountDto;
+import com.testapp.server.po.UserAccount;
 
 public class FriendFactory extends PersistentObjectFactory<Friend> {
 	
@@ -69,7 +67,7 @@ public class FriendFactory extends PersistentObjectFactory<Friend> {
 				account =
 					UserAccountFactory.getInstance().newUserAccount(email, "xxx-xx-xxxx",
 							"default_name"+System.currentTimeMillis(), 
-							UserAccountStatus.PENDING);
+							UserAccount.Status.PENDING);
 			} 
 			else if (accounts.size() ==1) {
 				account = accounts.get(0);

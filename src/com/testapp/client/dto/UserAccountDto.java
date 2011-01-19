@@ -1,11 +1,7 @@
-package com.testapp.client.pos;
+package com.testapp.client.dto;
 
 import java.io.Serializable;
 
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -13,50 +9,35 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="userAccount")
 @XmlAccessorType(XmlAccessType.FIELD)
-@PersistenceCapable(detachable="true")
-public class UserAccount implements Serializable {
+public class UserAccountDto {
 	
-	public enum UserAccountStatus {
+	public enum Status {
 		PENDING , ACCEPTED ;
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
     @XmlElement(name="key")
-	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long key;
 
     @XmlElement(name="email")
-	@Persistent
 	private String email="";
 
     @XmlElement(name="phoneNumber")
-	@Persistent
 	private String phoneNumber="";
 
     @XmlElement(name="username")
-	@Persistent
 	private String userName="";
 
     @XmlElement(name="status")
-	@Persistent
-	private UserAccountStatus status;
+	private Status status;
        
-	public UserAccount() {
-		
+	public UserAccountDto() {}
+	
+	public UserAccountDto(String email, String phoneNumber, String userName) {
+		this (email,phoneNumber, userName, Status.ACCEPTED);
 	}
 	
-	public UserAccount( String email, String phoneNumber,
-			String userName) {
-		this (email,phoneNumber, userName, UserAccountStatus.ACCEPTED);
-	}
-	
-	public UserAccount(String email, String phoneNumber,
-			String userName, UserAccountStatus status) {
+	public UserAccountDto(String email, String phoneNumber,
+                          String userName, Status status) {
 		super();
 		this.email = email;
 		this.phoneNumber = phoneNumber;
@@ -92,17 +73,17 @@ public class UserAccount implements Serializable {
 		return key;
 	}
 	
-	public UserAccountStatus getStatus() {
+	public Status getStatus() {
 		return status;
 	}
 	
-	public void setStatus(UserAccountStatus status) {
+	public void setStatus(Status status) {
 		this.status = status;
 	}
 
 	@Override
 	public String toString() {
-		return "UserAccount [email=" + email + ", key=" + key
+		return "UserAccountDto [email=" + email + ", key=" + key
 				+ ", phoneNumber=" + phoneNumber + ", userName=" + userName
 				+ ", status=" + status
 				+ "]";

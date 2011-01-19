@@ -3,7 +3,7 @@ package com.testapp.server;
 import java.util.List;
 
 import com.testapp.client.api.FriendshipAPI;
-import com.testapp.client.pos.UserAccount;
+import com.testapp.client.dto.UserAccountDto;
 
 public class FriendshipImpl implements FriendshipAPI {
 	
@@ -11,23 +11,23 @@ public class FriendshipImpl implements FriendshipAPI {
 		return new FriendshipImpl();
 	}
 
-    public List<UserAccount> getFriends(long userId) {
+    public List<UserAccountDto> getFriends(long userId) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public UserAccount addFriendship(long userId) {
+    public UserAccountDto addFriendship(long userId) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public UserAccount removeFriendship(long userId) {
+    public UserAccountDto removeFriendship(long userId) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public UserAccount addFriendshipByEmail(String email) {
+    public UserAccountDto addFriendshipByEmail(String email) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public UserAccount removeFriendshipByEmail(String email) {
+    public UserAccountDto removeFriendshipByEmail(String email) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

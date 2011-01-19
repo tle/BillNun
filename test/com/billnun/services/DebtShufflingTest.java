@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.testapp.client.dto.UserAccountDto;
+import com.testapp.server.po.UserAccount;
 import junit.framework.TestCase;
 
 import org.junit.After;
@@ -12,7 +14,6 @@ import org.junit.Test;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.testapp.client.pos.UserAccount;
 import com.testapp.server.DebtShufflingCore;
 import com.testapp.server.Graph;
 import com.testapp.server.Graph.Edge;

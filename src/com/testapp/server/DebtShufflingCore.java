@@ -12,8 +12,7 @@ public class DebtShufflingCore {
 	}
 	
 	static Comparator<Entry<Long, Integer>> entryComparator = new Comparator<Entry<Long,Integer>>() {
-		
-		@Override
+        
 		public int compare(Entry<Long, Integer> o1, Entry<Long, Integer> o2) {
             return Math.abs(o1.getValue()) - Math.abs(o2.getValue());
 		}

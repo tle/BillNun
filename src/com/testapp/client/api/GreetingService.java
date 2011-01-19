@@ -5,8 +5,9 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.testapp.client.LoginInfo;
-import com.testapp.client.pos.EntryRecord;
-import com.testapp.client.pos.UserAccount;
+import com.testapp.client.dto.EntryRecord;
+import com.testapp.client.dto.UserAccountDto;
+import com.testapp.server.po.UserAccount;
 
 /**
  * The client side stub for the RPC service.

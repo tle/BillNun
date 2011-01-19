@@ -1,10 +1,6 @@
 package com.testapp.client.api;
 
 import java.util.Collection;
-import java.util.List;
-
-import com.testapp.client.pos.UserAccount;
-import com.testapp.client.pos.UserGroup;
 
 public interface GroupAPI {
 

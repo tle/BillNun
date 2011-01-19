@@ -3,7 +3,7 @@ package com.testapp.server.jdo;
 import java.util.Collection;
 
 
-import com.testapp.client.pos.UserGroup;
+import com.testapp.client.dto.UserGroup;
 
 public class GroupFactory extends PersistentObjectFactory<UserGroup> {
 

@@ -7,8 +7,8 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 
 import com.testapp.client.api.FriendshipAPI;
-import com.testapp.client.pos.Payment;
-import com.testapp.client.pos.UserAccount;
+import com.testapp.client.dto.Payment;
+import com.testapp.client.dto.UserAccountDto;
 import com.testapp.server.FriendshipImpl;
 
 public class PaymentFactory extends PersistentObjectFactory<Payment> {
@@ -22,14 +22,14 @@ public class PaymentFactory extends PersistentObjectFactory<Payment> {
 	}
 	
 	/**
-	 * Considering we are passing in a list of UserAccount, we can assume that they are registerd
+	 * Considering we are passing in a list of UserAccountDto, we can assume that they are registerd
 	 * @param whoPayed
 	 * @param participants
 	 * @param amount
 	 * @param transactionDate
 	 * @param description
 	 */
-	public void recordPayment (List<UserAccount> whoPayed , List<UserAccount> participants , 
+	public void recordPayment (List<UserAccountDto> whoPayed , List<UserAccountDto> participants ,
 			double amount , Date transactionDate , String description) {
 		
 		//TODO we really need to put shit in transaction 
@@ -47,8 +47,8 @@ public class PaymentFactory extends PersistentObjectFactory<Payment> {
 			payment.setDate(transactionDate);
 			
 			//update balances between friends
-			for (UserAccount payer : whoPayed) {
-				for (UserAccount payee : participants) {
+			for (UserAccountDto payer : whoPayed) {
+				for (UserAccountDto payee : participants) {
 					if (!payer.getKey().equals(payee.getKey())) {
 						FriendFactory.getInstance().updateBalance(
 								payer.getKey(), payee.getKey(), amount);
@@ -61,9 +61,9 @@ public class PaymentFactory extends PersistentObjectFactory<Payment> {
 		}
 	}
 	
-	private List<Long> extractId(List<UserAccount> userAccountList) {
+	private List<Long> extractId(List<UserAccountDto> userAccountList) {
 		List<Long> idList = Collections.EMPTY_LIST;
-		for (UserAccount account : userAccountList) {
+		for (UserAccountDto account : userAccountList) {
 			idList.add(account.getKey());
 		}
 		return idList;

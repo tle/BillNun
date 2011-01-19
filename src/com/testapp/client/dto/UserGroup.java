@@ -1,9 +1,8 @@
-package com.testapp.client.pos;
+package com.testapp.client.dto;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.jdo.annotations.IdGeneratorStrategy;

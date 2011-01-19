@@ -5,7 +5,7 @@ import java.util.Date;
 import javax.jdo.PersistenceManager;
 
 import com.google.appengine.api.users.User;
-import com.testapp.client.pos.EntryRecord;
+import com.testapp.client.dto.EntryRecord;
 
 public class EntryRecordFactory extends PersistentObjectFactory<EntryRecord>{
 	

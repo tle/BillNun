@@ -1,12 +1,10 @@
 package com.testapp.server.rest;
 
-import com.testapp.client.pos.UserAccount;
-import com.testapp.server.jdo.FriendFactory;
+import com.testapp.client.dto.UserAccountDto;
+import com.testapp.server.po.UserAccount;
+import com.testapp.server.service.UserGroupService;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +12,14 @@ import java.util.List;
 @Path("/")
 public class HelloWorldResource {
 
-    static private List<UserAccount> fakeUsers;
+    static private List<UserAccountDto> fakeUsers;
 
     static {
-        fakeUsers = new ArrayList<UserAccount>();
-        fakeUsers.add(new UserAccount("bryanrcampbell@gmail.com","512-473-9310","bcampbell", UserAccount.UserAccountStatus.ACCEPTED));
-        fakeUsers.add(new UserAccount("trobertson@gmail.com","555-555-5555","trob", UserAccount.UserAccountStatus.PENDING));
-        fakeUsers.add(new UserAccount("tle@lombardi.com","555-567-8897","tle", UserAccount.UserAccountStatus.ACCEPTED));
-        fakeUsers.add(new UserAccount("cwalters@gmail.com","555-555-5555","cwalters", UserAccount.UserAccountStatus.PENDING));
+        fakeUsers = new ArrayList<UserAccountDto>();
+        fakeUsers.add(new UserAccountDto("bryanrcampbell@gmail.com","512-473-9310","bcampbell", UserAccountDto.Status.ACCEPTED));
+        fakeUsers.add(new UserAccountDto("trobertson@gmail.com","555-555-5555","trob", UserAccountDto.Status.PENDING));
+        fakeUsers.add(new UserAccountDto("tle@lombardi.com","555-567-8897","tle", UserAccountDto.Status.ACCEPTED));
+        fakeUsers.add(new UserAccountDto("cwalters@gmail.com","555-555-5555","cwalters", UserAccountDto.Status.PENDING));
     }
     
     @GET
@@ -34,8 +32,36 @@ public class HelloWorldResource {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/friends")
-    public List<UserAccount> getJson() {
+    public List<UserAccountDto> getJson() {
         return fakeUsers;
     }
 
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/users")
+    public UserAccountDto createUserAccount(UserAccountDto userAccount) {
+        UserAccount account = new UserAccount(userAccount.getEmail(),
+                userAccount.getPhoneNumber(),userAccount.getUserName(), UserAccount.Status.ACCEPTED);
+
+        account = UserGroupService.getInstance().createUser(account);
+
+        UserAccountDto newUser = new UserAccountDto(account.getEmail(),
+                account.getPhoneNumber(), account.getUserName(), UserAccountDto.Status.ACCEPTED);
+        
+        return newUser;
+    }
+
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/users")
+    public List<UserAccountDto> getUserAccounts() {
+        List<UserAccount> ua = UserGroupService.getInstance().getUsers();
+        List<UserAccountDto> dtos = new ArrayList<UserAccountDto>();
+
+        for(UserAccount account: ua) {
+            dtos.add(new UserAccountDto(account.getEmail(), account.getPhoneNumber(), account.getUserName(), UserAccountDto.Status.ACCEPTED));
+        }
+
+        return dtos;
+    }
 }
